@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>대시보드</title>
+<style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            color: #333;
+            text-align: center;
+            padding-top: 20%;
+        }
+        .btn {
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+.slide-left {
+  animation: slideInLeft 1s ease-out forwards;
+}
+.slide-right {
+  animation: slideInRight 1s ease-out forwards;
+}
+.stagger-container > * {
+  opacity: 0;
+  animation: fadeIn 1s ease-out forwards;
+}
+.stagger-container > *:nth-child(1) { animation-delay: 0.3s; }
+.stagger-container > *:nth-child(2) { animation-delay: 0.6s; }
+.stagger-container > *:nth-child(3) { animation-delay: 0.9s; }
+</style>
+</head>
+<body>
+<h1 class="fade-in">로그인 성공</h1>
+<button class="btn fade-in" onclick="window.location.href='sermon-writing.html'">말씀 작성하기</button>
+<button class="btn fade-in" onclick="window.location.href='grace-sharing.html'">은혜 나누기</button>
+</body>
+</html>

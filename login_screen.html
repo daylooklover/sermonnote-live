@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>로그인 화면</title>
+<style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            color: #333;
+            text-align: center;
+            padding-top: 20%;
+        }
+        .login-box {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: auto;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+.slide-left {
+  animation: slideInLeft 1s ease-out forwards;
+}
+.slide-right {
+  animation: slideInRight 1s ease-out forwards;
+}
+.stagger-container > * {
+  opacity: 0;
+  animation: fadeIn 1s ease-out forwards;
+}
+.stagger-container > *:nth-child(1) { animation-delay: 0.3s; }
+.stagger-container > *:nth-child(2) { animation-delay: 0.6s; }
+.stagger-container > *:nth-child(3) { animation-delay: 0.9s; }
+</style>
+</head>
+<body>
+<div class="login-box fade-in">
+<h2 class="fade-in">로그인</h2>
+<form class="fade-in" id="loginForm">
+<input id="username" placeholder="사용자 이름" required="" type="text"/><br/>
+<input id="password" placeholder="비밀번호" required="" type="password"/><br/>
+<button class="fade-in" type="submit">로그인</button>
+</form>
+</div>
+<script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+
+            if (username === 'admin' && password === 'password123') {
+                window.location.href = 'dashboard.html';  // 대시보드 페이지로 이동
+            } else {
+                alert('잘못된 사용자 이름이나 비밀번호입니다.');
+            }
+        });
+    </script>
+</body>
+</html>

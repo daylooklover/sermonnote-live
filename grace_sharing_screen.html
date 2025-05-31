@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>은혜 나누기</title>
+<style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .sharing-box {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+.slide-left {
+  animation: slideInLeft 1s ease-out forwards;
+}
+.slide-right {
+  animation: slideInRight 1s ease-out forwards;
+}
+.stagger-container > * {
+  opacity: 0;
+  animation: fadeIn 1s ease-out forwards;
+}
+.stagger-container > *:nth-child(1) { animation-delay: 0.3s; }
+.stagger-container > *:nth-child(2) { animation-delay: 0.6s; }
+.stagger-container > *:nth-child(3) { animation-delay: 0.9s; }
+</style>
+</head>
+<body>
+<div class="container fade-in">
+<div class="sharing-box fade-in">
+<h3>은혜 나누기</h3>
+<textarea placeholder="여러분의 은혜를 나누세요..." rows="10"></textarea>
+<button class="fade-in">은혜 나누기 저장</button>
+</div>
+</div>
+</body>
+</html>

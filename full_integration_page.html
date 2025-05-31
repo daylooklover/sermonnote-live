@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>전체 연동</title>
+<style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        button {
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+.slide-left {
+  animation: slideInLeft 1s ease-out forwards;
+}
+.slide-right {
+  animation: slideInRight 1s ease-out forwards;
+}
+.stagger-container > * {
+  opacity: 0;
+  animation: fadeIn 1s ease-out forwards;
+}
+.stagger-container > *:nth-child(1) { animation-delay: 0.3s; }
+.stagger-container > *:nth-child(2) { animation-delay: 0.6s; }
+.stagger-container > *:nth-child(3) { animation-delay: 0.9s; }
+</style>
+</head>
+<body>
+<div class="container fade-in">
+<h1 class="fade-in">환영합니다!</h1>
+<!-- 초기화면 링크 -->
+<button class="fade-in" onclick="window.location.href='initial_screen.html'">초기화면</button>
+<!-- 로그인 후 대시보드 화면 링크 -->
+<button class="fade-in" onclick="window.location.href='login_screen.html'">로그인</button>
+<!-- 대시보드에서 설교문 작성, 은혜 나누기 버튼 -->
+<button class="fade-in" onclick="window.location.href='dashboard_screen.html'">대시보드</button>
+<button class="fade-in" onclick="window.location.href='sermon_writing_screen.html'">설교문 작성하기</button>
+<button class="fade-in" onclick="window.location.href='grace_sharing_screen.html'">은혜 나누기</button>
+</div>
+</body>
+</html>

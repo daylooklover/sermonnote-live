@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>초기화면</title>
+<style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 20%;
+        }
+        h1 {
+            color: #333;
+        }
+        .btn {
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+.slide-left {
+  animation: slideInLeft 1s ease-out forwards;
+}
+.slide-right {
+  animation: slideInRight 1s ease-out forwards;
+}
+.stagger-container > * {
+  opacity: 0;
+  animation: fadeIn 1s ease-out forwards;
+}
+.stagger-container > *:nth-child(1) { animation-delay: 0.3s; }
+.stagger-container > *:nth-child(2) { animation-delay: 0.6s; }
+.stagger-container > *:nth-child(3) { animation-delay: 0.9s; }
+</style>
+<style>
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #e0f0ff, #ffffff);
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+h1 {
+  font-size: 2.5em;
+  margin-top: 100px;
+  animation: fadeInUp 1.5s ease-out forwards;
+}
+p {
+  font-size: 1.2em;
+  color: #444;
+  animation: fadeInUp 2s ease-out forwards;
+}
+button {
+  margin-top: 40px;
+  padding: 12px 30px;
+  font-size: 1em;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  animation: fadeInUp 2.5s ease-out forwards;
+}
+button:hover {
+  background-color: #357ab8;
+}
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2em;
+  }
+  p {
+    font-size: 1em;
+  }
+  button {
+    font-size: 0.9em;
+    padding: 10px 24px;
+  }
+}
+</style>
+
+
+
+<script>
+const verses = [
+  {
+    kr: "여호와는 나의 목자시니 내게 부족함이 없으리로다",
+    en: "The Lord is my shepherd, I shall not be in want.",
+    ref: "시편 23:1 / Psalm 23:1"
+  },
+  {
+    kr: "항상 기뻐하라 쉬지 말고 기도하라 범사에 감사하라",
+    en: "Be joyful always; pray continually; give thanks in all circumstances.",
+    ref: "데살로니가전서 5:16-18 / 1 Thessalonians 5:16-18"
+  },
+  {
+    kr: "내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라",
+    en: "I can do everything through him who gives me strength.",
+    ref: "빌립보서 4:13 / Philippians 4:13"
+  },
+  {
+    kr: "주는 나의 피난처시요 나의 요새시요 내가 의뢰하는 하나님이시라",
+    en: "He is my refuge and my fortress, my God, in whom I trust.",
+    ref: "시편 91:2 / Psalm 91:2"
+  },
+  {
+    kr: "두려워하지 말라 내가 너와 함께 함이라",
+    en: "Do not fear, for I am with you.",
+    ref: "이사야 41:10 / Isaiah 41:10"
+  }
+];
+
+window.onload = function() {
+  const today = new Date();
+  const index = today.getDate() % verses.length;
+  const verse = verses[index];
+
+  const verseText = document.getElementById("verseText");
+  const verseRef = document.getElementById("verseRef");
+
+  let showKorean = true;
+
+  function toggleVerse() {
+    if (showKorean) {
+      verseText.textContent = verse.kr;
+    } else {
+      verseText.textContent = verse.en;
+    }
+    verseRef.textContent = verse.ref;
+    showKorean = !showKorean;
+  }
+
+  toggleVerse(); // 초기 표시
+  setInterval(toggleVerse, 2000); // 2초마다 전환
+};
+</script>
+</head>
+<body>
+<h1 class="fade-in">환영합니다!</h1><p id="verseText"></p><small id="verseRef"></small>
+<button class="btn fade-in" onclick="goToLogin()">로그인</button>
+</body>
+</html>
