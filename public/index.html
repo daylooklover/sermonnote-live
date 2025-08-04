@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-900">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SermonNote - Deepen Your Faith, Organize Your Insights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Common styles for both landing and app */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c; /* Tailwind gray-900 */
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Landing Page Specific Styles --- */
+        .header-logo {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        .feature-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+        }
+        .verse-display-area {
+            border: 2px solid #10B981; /* Green-500 */
+            font-size: 1.125rem;
+            font-style: italic;
+            text-align: center;
+        }
+        /* Mobile menu styles */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%); /* 기본적으로 숨겨진 상태 */
+        }
+        #mobile-menu.active {
+            transform: translateX(0); /* 활성화 시 보임 */
+        }
+
+        /* --- App Specific Styles (from your provided code) --- */
+        .sermon-type-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            background-color: #2D3748; /* Tailwind gray-800 */
+            border-radius: 1rem;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .sermon-type-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+        }
+        .sermon-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        .sermon-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        .sermon-description {
+            font-size: 0.875rem;
+            color: #A0AEC0; /* Tailwind gray-400 */
+            margin-top: 0.25rem;
+        }
+        .loading-animation::after {
+            content: '';
+            animation: dot-flashing 1s infinite linear alternate;
+        }
+        @keyframes dot-flashing {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+        .memo-list-item.selected {
+            border: 2px solid #63b3ed; /* Tailwind blue-400 */
+            background-color: #4A5568; /* Tailwind gray-700 */
+        }
+        .suggestion-item.selected {
+            border: 2px solid #38A169; /* Tailwind green-600 */
+            background-color: #4A5568; /* Tailwind gray-700 */
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #1a202c; /* Tailwind gray-900 */
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 90%;
+            max-height: 90%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .modal-body {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .modal-footer {
+            margin-top: 1rem;
+            text-align: right;
+        }
+        .close-modal-btn {
+            background-color: #6366f1; /* Tailwind indigo-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+        .fullscreen-modal .modal-content {
+            max-width: 90vw; /* 변경: 기존 100vw에서 90vw로 변경하여 여백 부여 */
+            max-height: 90vh; /* 변경: 기존 100vh에서 90vh로 변경하여 여백 부여 */
+            border-radius: 1rem; /* 변경: 모서리 둥글게 */
+            padding: 2rem; /* 변경: 패딩 조절 */
+        }
+        .fullscreen-modal #fullscreen-textarea {
+            resize: vertical; /* 높이 조절 기능 */
+        }
+        /* New print-specific styles */
+        @media print {
+            body > *:not(.print-content) {
+                display: none !important;
+            }
+            .print-content {
+                display: block !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: auto;
+                margin: 0;
+                padding: 20px; /* Adjust padding for print */
+                color: black; /* Text color for print */
+                background-color: white; /* Background for print */
+                font-family: serif; /* Font for print */
+                font-size: 12pt;
+                line-height: 1.5;
+            }
+            .print-content pre {
+                white-space: pre-wrap; /* Ensure line breaks are honored */
+            }
+            /* Hide print buttons */
+            .print-button-group {
+                display: none !important;
+            }
+        }
+
+        /* Quick Memo Popup Specific Styles */
+        .quick-memo-popup .modal-content {
+            max-width: 500px; /* Adjust size for memo popup */
+            max-height: 80vh;
+            width: 90%;
+            padding: 1.5rem;
+        }
+        .quick-memo-popup textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        /* Premium Screen Styles */
+        .premium-card {
+            background-color: #2d3748; /* Tailwind gray-800 */
+            border: 2px solid #3B82F6; /* Blue-600 */
+            padding: 2.5rem;
+            border-radius: 1rem;
+            text-align: center;
+        }
+        .premium-benefits-list {
+            list-style: none;
+            padding: 0;
+            margin: 1.5rem 0;
+        }
+        .premium-benefits-list li {
+            background-color: #4A5568; /* Gray-700 */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.125rem;
+            color: #CBD5E0; /* Gray-300 */
+        }
+        .premium-benefits-list li svg {
+            margin-right: 0.5rem;
+            color: #10B981; /* Green-500 */
+        }
+    </style>
+</head>
+<body class="h-full bg-gray-900 text-white">
+
+    <header class="bg-gray-900 shadow-md fixed w-full z-10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="https://placehold.co/40x40/333/fff?text=SN" alt="SermonNote Logo" class="header-logo">
+                <span class="text-xl font-bold text-gray-300">SermonNote</span>
+            </div>
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav class="hidden md:flex items-center space-x-4">
+                <a href="#" id="nav-features-link" class="text-gray-300 hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">Features</a>
+                <a href="#" id="nav-benefits-link" class="text-gray-300 hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">Why SermonNote?</a>
+                <button id="header-auth-button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">Sign Up / Login</button>
+            </nav>
+        </div>
+        <div id="mobile-menu" class="md:hidden fixed top-0 right-0 h-full w-64 bg-gray-800 p-6 shadow-lg z-20">
+            <div class="flex justify-end mb-4">
+                <button id="close-mobile-menu-button" class="text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <nav class="flex flex-col space-y-4">
+                <a href="#" id="mobile-nav-features-link" class="text-gray-300 hover:text-blue-400 text-lg font-medium py-2 border-b border-gray-700">Features</a>
+                <a href="#" id="mobile-nav-benefits-link" class="text-gray-300 hover:text-blue-400 text-lg font-medium py-2 border-b border-gray-700">Why SermonNote?</a>
+                <button id="mobile-auth-button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 mt-4">Sign Up / Login</button>
+            </nav>
+        </div>
+    </header>
+
+    <div id="main-content-wrapper" class="relative min-h-screen flex flex-col items-center justify-start pt-24 pb-12">
+        <div id="landing-page-section" class="w-full">
+            <main class="container mx-auto px-6 flex flex-col items-center">
+                <section id="hero-section" class="text-center py-12">
+                    <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight">SermonNote</h1>
+                    <p class="mt-4 text-xl md:text-2xl font-light text-gray-400">Deepen Your Faith, Organize Your Insights.</p>
+                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-8">
+                        <button id="landing-main-auth-button" class="bg-blue-600 hover:bg-blue-700 text-white py-4 px-8 rounded-lg text-xl font-bold transition duration-300 shadow-lg">Sign Up / Login</button>
+                        <button id="landing-premium-button" class="bg-green-500 hover:bg-green-600 text-white py-4 px-8 rounded-lg text-xl font-bold transition duration-300 shadow-lg">Go Premium</button>
+                        <button id="landing-quick-memo-button" class="bg-amber-400 hover:bg-amber-500 text-gray-900 py-4 px-8 rounded-lg text-xl font-bold transition duration-300 shadow-lg">Quick Memo</button>
+                    </div>
+                </section>
+
+                <section id="features-section" class="w-full max-w-5xl mt-16">
+                    <h2 class="text-3xl font-bold text-center text-blue-500 mb-8">Our Unique Features</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center" data-target-screen="sermon-selection-screen">
+                            <h3 class="text-xl font-semibold text-blue-300 mb-2">AI-Powered Insights</h3>
+                            <p class="text-gray-400">Leverage advanced AI to generate commentary, insights, and sermon drafts from any scripture or topic.</p>
+                        </div>
+                        <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center" data-target-screen="sermon-selection-screen">
+                            <h3 class="text-xl font-semibold text-blue-300 mb-2">Expository Sermon Creation</h3>
+                            <p class="text-gray-400">Deep exploration of biblical truth and precise interpretation.</p>
+                        </div>
+                        <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center" data-target-screen="sermon-selection-screen">
+                            <h3 class="text-xl font-semibold text-blue-300 mb-2">Real-Life Application</h3>
+                            <p class="text-gray-400">Connect scripture to daily life events with AI-suggested verses and themes for practical sermons.</p>
+                        </div>
+                        <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center" data-target-screen="sermon-selection-screen">
+                            <h3 class="text-xl font-semibold text-blue-300 mb-2">Quick Memo Integration</h3>
+                            <p class="text-gray-400">Seamlessly transform scattered notes and voice memos into cohesive sermon outlines.</p>
+                        </div>
+                        <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center" data-target-screen="sermon-selection-screen">
+                            <h3 class="text-xl font-semibold text-blue-300 mb-2">Secure & Organized</h3>
+                            <p class="text-gray-400">Keep all your spiritual insights, notes, and sermons organized and securely stored.</p>
+                        </div>
+                        <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center" data-target-screen="sermon-selection-screen">
+                            <h3 class="text-xl font-semibold text-blue-300 mb-2">Community Sharing (Optional)</h3>
+                            <p class="text-gray-400">Share insights and grow with a community of fellow believers and leaders.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="benefits-section" class="w-full max-w-4xl mt-16 text-center">
+                    <h2 class="text-3xl font-bold text-blue-500 mb-8">Why SermonNote?</h2>
+                    <ul class="text-lg space-y-4 text-gray-300">
+                        <li>Streamline your sermon preparation process.</li>
+                        <li>Enhance your understanding of the Bible with AI assistance.</li>
+                        <li>Keep all your spiritual insights organized in one place.</li>
+                        <li>Grow in faith with a dedicated study companion.</li>
+                    </ul>
+                </section>
+
+                <section id="verse-section" class="w-full max-w-3xl mt-16">
+                    <h3 class="text-2xl font-bold text-center text-green-500 mb-4">Verse of the Moment</h3>
+                    <div id="bible-verse-display" class="verse-display-area min-h-20 flex items-center justify-center p-6 bg-gray-800 rounded-lg text-lg">
+                        Loading a verse...
+                    </div>
+                </section>
+            </main>
+
+            <footer class="bg-gray-900 text-gray-500 py-8 text-center mt-16">
+                <div class="container mx-auto px-6">
+                    <p>&copy; 2025 SermonNote. All rights reserved.</p>
+                    <div class="flex justify-center space-x-6 mt-4">
+                        <a href="#" class="hover:text-white transition duration-300">Privacy Policy</a>
+                        <a href="#" class="hover:text-white transition duration-300">Terms of Service</a>
+                        <a href="#" class="hover:text-white transition duration-300">Contact Us</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <div id="app-sections" class="hidden w-full flex flex-col items-center justify-center p-6">
+            <div class="w-full max-w-4xl text-center py-4">
+                <h2 id="main-title" class="text-4xl md:text-5xl font-bold text-blue-500">Welcome to SermonNote</h2>
+                <p id="main-description" class="mt-2 text-xl md:text-2xl font-light text-gray-300">Deepen Your Faith, Organize Your Insights.</p>
+            </div>
+
+            <div id="login-screen" class="w-full max-w-md mt-12 bg-gray-800 p-8 rounded-3xl shadow-lg border border-blue-500/30">
+                <h2 id="login-modal-title" class="text-2xl font-bold text-center text-blue-400 mb-6">Login</h2>
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300">Email Address</label>
+                        <input type="email" id="email" class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+                        <input type="password" id="password" class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3">
+                    </div>
+                    <button type="submit" id="auth-submit-button" class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition duration-200 ease-in-out">
+                        Login
+                    </button>
+                    <div id="auth-error-message" class="text-red-400 text-sm text-center mt-2 hidden"></div>
+                    <button type="button" id="toggle-auth-mode-button" class="w-full text-blue-400 hover:underline transition duration-200 mt-4">
+                        Don't have an account? Sign Up
+                    </button>
+                    <button type="button" id="forgot-password-button" class="w-full text-sm text-blue-400 hover:underline transition duration-200 mt-2">
+                        Forgot Password?
+                    </button>
+                </form>
+            </div>
+
+            <div id="sermon-selection-screen" class="hidden w-full max-w-4xl mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
+                <button id="back-to-landing-button" class="col-span-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 mb-4">
+                    ← Back to Initial Screen
+                </button>
+                <button id="btn-assistant" class="sermon-type-button">
+                    <span class="sermon-icon">🤖</span>
+                    <span class="sermon-title">Sermon Assistant</span>
+                    <span class="sermon-description">Get AI-powered commentary and sermon drafts instantly.</span>
+                </button>
+                <button id="btn-expository" class="sermon-type-button">
+                    <span class="sermon-icon">📖</span>
+                    <span class="sermon-title">Expository Sermon</span>
+                    <span class="sermon-description">Deep exploration of biblical truth and precise interpretation.</span>
+                </button>
+                <button id="btn-real-life" class="sermon-type-button">
+                    <span class="sermon-icon">💡</span>
+                    <span class="sermon-title">Real-Life Application Sermon</span>
+                    <span class="sermon-description">The power of God's Word permeating daily life.</span>
+                </button>
+                <button id="btn-linked" class="sermon-type-button">
+                    <span class="sermon-icon">🔗</span>
+                    <span class="sermon-title">Quick Memo Linked Sermon</span>
+                    <span class="sermon-description">Weaving scattered pieces of inspiration into a cohesive whole.</span>
+                </button>
+            </div>
+
+            <div id="sermon-assistant-screen" class="hidden w-full max-w-xl mt-8">
+                <div class="bg-gray-800 p-6 rounded-3xl shadow-lg border border-blue-500/30">
+                    <button id="back-button-assistant" class="text-gray-400 hover:text-white mb-4">← Back to Selection</button>
+                    <h2 class="text-2xl font-bold text-center text-blue-400 mb-6">Sermon Assistant</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="ai-input" class="block text-sm font-medium text-gray-300">Topic, Question or Bible Verse</label>
+                            <input type="text" id="ai-input" placeholder="Enter a topic, question or Bible verse" class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3">
+                        </div>
+                        <div class="flex flex-col md:flex-row gap-2 mt-4">
+                            <button id="get-commentary-button" class="w-full md:w-1/2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition duration-200 ease-in-out">
+                                Get Commentary
+                            </button>
+                            <button id="generate-sermon-button" class="w-full md:w-1/2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-md transition duration-200 ease-in-out">
+                                Generate Sermon with AI
+                            </button>
+                        </div>
+                        <div class="mt-4">
+                            <label for="commentary-output" class="block text-sm font-medium text-gray-300">AI Commentary:</label>
+                            <textarea id="commentary-output" rows="8" readonly class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 resize-none">Generated AI commentary will appear here.</textarea>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="sermon-output" class="block text-sm font-medium text-gray-300">Generated Sermon:</label>
+                                <button id="fullscreen-button-assistant" class="text-gray-400 hover:text-white text-sm">Full Screen</button>
+                            </div>
+                            <textarea id="sermon-output" rows="12" readonly class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 resize-none">Generated sermon will appear here.</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="expository-sermon-screen" class="hidden w-full max-w-xl mt-8">
+                <div class="bg-gray-800 p-6 rounded-3xl shadow-lg border border-blue-500/30">
+                    <button id="back-button-expository" class="text-gray-400 hover:text-white mb-4">← Back to Selection</button>
+                    <h2 class="text-2xl font-bold text-center text-blue-400 mb-6">Expository Sermon</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="expository-verse-input" class="block text-sm font-medium text-gray-300">Bible Verse (e.g., John 3:16)</label>
+                            <input type="text" id="expository-verse-input" placeholder="Enter a Bible verse" class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3">
+                        </div>
+                        <div class="flex flex-col md:flex-row gap-2 mt-4">
+                            <button id="expository-lookup-button" class="w-full md:w-1/2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition duration-300 ease-in-out">
+                                Lookup Scripture
+                            </button>
+                            <button id="expository-generate-button" class="w-full md:w-1/2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-md transition duration-300 ease-in-out">
+                                Generate Sermon with AI
+                            </button>
+                        </div>
+                        <div class="mt-4">
+                            <label for="expository-scripture-output" class="block text-sm font-medium text-gray-300">Scripture:</label>
+                            <textarea id="expository-scripture-output" rows="4" readonly class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 resize-none"></textarea>
+                        </div>
+                        <div class="mt-4">
+                            <label for="expository-commentary-output" class="block text-sm font-medium text-gray-300">AI Commentary:</label>
+                            <textarea id="expository-commentary-output" rows="8" readonly class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 resize-none"></textarea>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="expository-sermon-output" class="block text-sm font-medium text-gray-300">Generated Sermon:</label>
+                                <button id="fullscreen-button-expository" class="text-gray-400 hover:text-white text-sm">Full Screen</button>
+                            </div>
+                            <textarea id="expository-sermon-output" rows="12" readonly class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 resize-none">Generated sermon will appear here.</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="real-life-sermon-screen" class="hidden w-full max-w-xl mt-8">
+                <div class="bg-gray-800 p-6 rounded-3xl shadow-lg border border-blue-500/30">
+                    <button id="back-button-real-life" class="text-gray-400 hover:text-white mb-4">← Back to Selection</button>
+                    <h2 class="text-2xl font-bold text-center text-blue-400 mb-6">Real-Life Application Sermon</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="real-life-notes-input" class="block text-sm font-medium text-gray-300">Real-Life Event or Topic</label>
+                            <textarea id="real-life-notes-input" rows="8" placeholder="e.g., A promotion at work, a personal struggle, a global crisis..." class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 resize-none"></textarea>
+                        </div>
+                        <div class="flex flex-col md:flex-row gap-2 mt-4">
+                            <button id="real-life-suggest-button" class="w-full md:w-1/2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition duration-300 ease-in-out">
+                                Suggest Scripture & Themes
+                            </button>
+                            <button id="real-life-generate-button" class="w-full md:w-1/2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-md transition duration-300 ease-in-out">
+                                Generate Sermon with AI
+                            </button>
+                        </div>
+                        <div class="mt-4">
+                            <label for="real-life-suggestions-output" class="block text-sm font-medium text-gray-300">AI Suggestions:</label>
+                            <textarea id="real-life-suggestions-output" rows="8" readonly class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 resize-none"></textarea>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="real-life-sermon-output" class="block text-sm font-medium text-gray-300">Generated Sermon:</label>
+                                <button id="fullscreen-button-real-life" class="text-gray-400 hover:text-white text-sm">Full Screen</button>
+                            </div>
+                            <textarea id="real-life-sermon-output" rows="12" readonly class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quick-memo-sermon-screen" class="hidden w-full max-w-xl mt-8">
+                <div class="bg-gray-800 p-6 rounded-3xl shadow-lg border border-blue-500/30">
+                    <button id="back-button-memo" class="text-gray-400 hover:text-white mb-4">← Back to Selection</button>
+                    <h2 class="text-2xl font-bold text-center text-blue-400 mb-6">Quick Memo Linked Sermon</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Your Memos:</label>
+                            <ul id="memo-list" class="mt-2 space-y-2">
+                                </ul>
+                        </div>
+                        <div id="suggestions-area" class="hidden mt-4 space-y-4">
+                            <div>
+                                <h4 class="font-semibold text-gray-300">Suggested Verses:</h4>
+                                <ul id="suggested-verses" class="mt-1 space-y-1">
+                                    </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-300">Suggested Titles:</h4>
+                                <ul id="suggested-titles" class="mt-1 space-y-1">
+                                    </ul>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="memo-sermon-output" class="block text-sm font-medium text-gray-300">Generated Sermon:</label>
+                            <textarea id="memo-sermon-output" rows="12" readonly class="mt-1 block w-full rounded-xl border-gray-700 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 resize-none">Generated sermon will appear here.</textarea>
+                        </div>
+                        <div class="text-center">
+                            <button id="generate-sermon-button-memo" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-md transition duration-200 ease-in-out">
+                                Generate Sermon with AI
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="fullscreen-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title" class="text-xl font-bold">Generated Sermon</h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="fullscreen-textarea" class="w-full h-full bg-transparent text-white text-lg p-4" ></textarea>
+            </div>
+            <div class="modal-footer flex justify-end space-x-4 print-button-group">
+                <button id="save-sermon-button" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300">Save Sermon</button>
+                <button id="print-sermon-button" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition duration-300">Print Sermon</button>
+                <button id="modal-close-btn-footer" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition duration-300">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quick-memo-popup-modal" class="modal-overlay hidden quick-memo-popup">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-xl font-bold">Quick Memo</h3>
+                <button id="close-quick-memo-modal-btn" class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="quick-memo-textarea" class="w-full h-full bg-gray-700 text-white text-base p-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring-blue-500" placeholder="Type your memo here..."></textarea>
+                <div class="mt-4 flex justify-between items-center">
+                    <button id="record-memo-button" class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition duration-300">
+                        🎙️ Record
+                    </button>
+                    <span id="recording-status" class="text-sm text-gray-400 hidden">Recording...</span>
+                </div>
+            </div>
+            <div class="modal-footer flex justify-end space-x-4 mt-4">
+                <button id="save-quick-memo-button" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition duration-300">Save</button>
+                <button id="cancel-quick-memo-button" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition duration-300">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="premium-screen" class="hidden w-full max-w-2xl mt-12">
+        <div class="premium-card">
+            <h2 class="text-4xl font-bold text-yellow-400 mb-6">Unlock Premium Features!</h2>
+            <p class="text-xl text-gray-300 mb-8">Upgrade to Premium to access exclusive benefits:</p>
+            <ul class="premium-benefits-list">
+                <li><svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Unlimited AI Sermon Generation</li>
+             <li><svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Advanced AI Personalization</li>
+                <li><svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Cloud Sync & Storage for All Notes</li>
+                <li><svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Priority Support</li>
+            </ul>
+            <button id="upgrade-now-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl shadow-md transition duration-300">Upgrade Now</button>
+            <button id="back-from-premium-button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg text-xl shadow-md transition duration-300 mt-4 ml-4">Back to App</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script>
+        // ⭐⭐⭐ IMPORTANT: Replace with your actual Firebase project configuration ⭐⭐⭐
+        const firebaseConfig = {
+             apiKey: "AIzaSyCvHR90fyN-RAexGJ6XUDStQVUbEds9U9U", // 웹 API 키 (스크린샷에서 확인)
+             authDomain: "sermonnote-live.firebaseapp.com", // 프로젝트 ID.firebaseapp.com (자동 구성)
+             projectId: "sermonnote-live", // 프로젝트 ID (스크린샷에서 확인)
+             storageBucket: "sermonnote-live.firebasestorage.app", // 스크린샷에서 확인 (.appspot.com이 아님)
+             messagingSenderId: "520754190508", // 프로젝트 번호 (스크린샷에서 확인)
+             appId: "1:520754190508:web:cc4271b1e96e0bed3ee709", // 🎉🎉🎉 최종 확인된 웹 앱 ID! 🎉🎉🎉
+             measurementId: "G-CWDVF5K3HX" // ⭐ 추가됨: 스크린샷에서 확인된 measurementId ⭐
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(); // Get Firebase Auth instance
+
+         const apiKey = "AIzaSyD4qxYQf7BXy4q8aP8Hyd-fif_WdGC8w2E";
+        const LOCAL_STORAGE_MEMO_KEY = 'sermonnote_quick_memos'; // localStorage key for memos
+
+        // --- Utility Functions ---
+        function isBibleVerse(input) {
+            const regex = /^[a-zA-Z]+\s+\d{1,3}(:\d{1,3})?(-\d{1,3})?$/;
+            return regex.test(input.trim());
+        }
+
+        // --- Global Auth UI state ---
+        let isLoginMode = true; // Default to login mode for the auth screen
+        let loginModalTitle;
+        let authSubmitButton;
+        let toggleAuthModeButton;
+        let authErrorMessage;
+        let emailInput;
+        let passwordInput;
+        let forgotPasswordButton;
+
+        function updateAuthScreenUI() {
+            if (loginModalTitle && authSubmitButton && toggleAuthModeButton && forgotPasswordButton) { // Ensure all elements are found
+                if (isLoginMode) {
+                    loginModalTitle.textContent = 'Login';
+                    authSubmitButton.textContent = 'Login';
+                    toggleAuthModeButton.textContent = 'Don\'t have an account? Sign Up';
+                    forgotPasswordButton.classList.remove('hidden'); // Show Forgot Password in login mode
+                } else {
+                    loginModalTitle.textContent = 'Sign Up';
+                    authSubmitButton.textContent = 'Sign Up';
+                    toggleAuthModeButton.textContent = 'Already have an account? Login';
+                    forgotPasswordButton.classList.add('hidden'); // Hide Forgot Password in sign up mode
+                }
+                authErrorMessage.classList.add('hidden'); // Clear previous errors
+                emailInput.value = ''; // Clear inputs
+                passwordInput.value = '';
+            }
+        }
+        // --- End Global Auth UI state ---
+
+
+        function showLoading(button, isLoading) {
+            if (isLoading) {
+                button.disabled = true;
+                button.textContent = 'Generating...';
+                button.classList.add('loading-animation');
+            } else {
+                button.disabled = false;
+                if (button.id.includes('lookup')) {
+                    button.textContent = 'Get Commentary';
+                } else if (button.id.includes('generate')) {
+                    button.textContent = 'Generate Sermon with AI';
+                } else if (button.id.includes('suggest')) {
+                    button.textContent = 'Suggest Scripture & Themes';
+                } else if (button.id.includes('record-memo')) {
+                    button.textContent = '🎙️ Record'; // Changed to English
+                } else if (button.id.includes('auth-submit')) { // For auth button, needs access to isLoginMode
+                    button.textContent = isLoginMode ? 'Login' : 'Sign Up'; // Revert text based on mode
+                }
+                button.classList.remove('loading-animation');
+            }
+        }
+
+        async function callGeminiApi(prompt) {
+            console.log("Sending prompt to Gemini API:", prompt);
+            if (!apiKey || apiKey === "YOUR_ACTUAL_GEMINI_API_KEY_HERE") {
+                throw new Error("Gemini API Key is not set. Please set the 'apiKey' variable in the script.");
+            }
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }]
+            };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Gemini API error:", errorData);
+                    throw new Error(`API call failed: ${response.statusText} - ${errorData.error ? errorData.error.message : 'Unknown error'}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    throw new Error("Invalid response format from API.");
+                }
+            } catch (error) {
+                console.error("Error in callGeminiApi:", error);
+                throw error;
+            }
+        }
+
+        function showScreen(screenId) {
+            const screens = ['login-screen', 'sermon-selection-screen', 'sermon-assistant-screen', 'expository-sermon-screen', 'real-life-sermon-screen', 'quick-memo-sermon-screen', 'premium-screen'];
+            screens.forEach(id => {
+                const screen = document.getElementById(id);
+                if (screen) {
+                    if (id === screenId) {
+                        screen.classList.remove('hidden');
+                    } else {
+                        screen.classList.add('hidden');
+                    }
+                }
+            });
+            
+            const mainTitle = document.getElementById('main-title');
+            const mainDescription = document.getElementById('main-description');
+            
+            if (mainTitle && mainDescription) {
+                if (screenId === 'sermon-selection-screen') {
+                    mainTitle.textContent = 'Choose Sermon Type';
+                    mainDescription.textContent = 'Select the type of sermon you want to create.';
+                } else if (screenId === 'sermon-assistant-screen') {
+                    mainTitle.textContent = 'Sermon Assistant';
+                    mainDescription.textContent = 'Get AI-powered commentary and sermon drafts instantly.';
+                } else if (screenId === 'expository-sermon-screen') {
+                    mainTitle.textContent = 'Expository Sermon';
+                    mainDescription.textContent = 'Deep exploration of biblical truth and precise interpretation.';
+                } else if (screenId === 'real-life-sermon-screen') {
+                    mainTitle.textContent = 'Real-Life Application Sermon';
+                    mainDescription.textContent = 'The power of God\'s Word permeating daily life.';
+                } else if (screenId === 'quick-memo-sermon-screen') {
+                    mainTitle.textContent = 'Quick Memo Linked Sermon';
+                    mainDescription.textContent = 'Weaving scattered pieces of inspiration into a cohesive whole.';
+                } else if (screenId === 'premium-screen') {
+                    mainTitle.textContent = 'Unlock Premium Features';
+                    mainDescription.textContent = 'Enhance your experience with exclusive tools.';
+                } else if (screenId === 'login-screen') {
+                    mainTitle.textContent = 'Welcome to SermonNote';
+                    mainDescription.textContent = 'Deepen Your Faith, Organize Your Insights.';
+                }
+            }
+        }
+        
+        function showFullscreenModal(title, content) {
+            const modal = document.getElementById('fullscreen-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalTextarea = document.getElementById('fullscreen-textarea');
+            
+            if (modal && modalTitle && modalTextarea) {
+                modalTitle.textContent = title;
+                modalTextarea.value = content;
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+        }
+        
+        function hideFullscreenModal() {
+            const modal = document.getElementById('fullscreen-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        }
+
+        // --- Quick Memo Popup Functions (Updated for real recording and STT) ---
+        const quickMemoPopupModal = document.getElementById('quick-memo-popup-modal');
+        const quickMemoTextarea = document.getElementById('quick-memo-textarea');
+        const recordMemoButton = document.getElementById('record-memo-button');
+        const recordingStatus = document.getElementById('recording-status'); // "Recording..." text
+        const saveQuickMemoButton = document.getElementById('save-quick-memo-button');
+        const closeQuickMemoModalButton = document.getElementById('close-quick-memo-modal-btn');
+        const cancelQuickMemoButton = document.getElementById('cancel-quick-memo-button');
+
+        let mediaRecorder; // For actual audio recording
+        let audioChunks = [];
+        let speechRecognition; // For speech-to-text
+
+        function showQuickMemoModal() {
+            if (quickMemoPopupModal) {
+                quickMemoTextarea.value = ''; // Clear previous content
+                recordingStatus.classList.add('hidden'); // Hide recording status
+                recordMemoButton.textContent = '🎙️ Record'; // Reset record button text
+                recordMemoButton.classList.remove('bg-red-600'); // Reset button color
+                recordMemoButton.disabled = false; // Enable button
+                quickMemoPopupModal.classList.remove('hidden');
+                quickMemoPopupModal.style.display = 'flex';
+            }
+        }
+
+        function hideQuickMemoModal() {
+            if (quickMemoPopupModal) {
+                // Stop any ongoing recording when modal is closed
+                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                    mediaRecorder.stop();
+                }
+                if (speechRecognition) {
+                    speechRecognition.stop();
+                }
+                quickMemoPopupModal.classList.add('hidden');
+                quickMemoPopupModal.style.display = 'none';
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    stream.getTracks().forEach(track => track.stop()); // Stop microphone access
+                    console.log("Recording stopped. Audio Blob available.");
+                };
+
+                mediaRecorder.start();
+                
+                // Speech Recognition Setup
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (SpeechRecognition) {
+                    speechRecognition = new SpeechRecognition();
+                    speechRecognition.continuous = true;
+                    speechRecognition.interimResults = true;
+                    speechRecognition.lang = 'en-US';
+
+                    let finalTranscript = '';
+
+                    speechRecognition.onresult = event => {
+                        let interimTranscript = '';
+                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                            if (event.results[i].isFinal) {
+                                finalTranscript += event.results[i][0].transcript;
+                            } else {
+                                interimTranscript += event.results[i][0].transcript;
+                            }
+                        }
+                        quickMemoTextarea.value = finalTranscript + interimTranscript;
+                    };
+
+                    speechRecognition.onerror = event => {
+                        console.error('Speech recognition error:', event.error);
+                        recordingStatus.textContent = 'Speech Error: ' + event.error;
+                        recordMemoButton.classList.remove('bg-red-600');
+                        recordMemoButton.textContent = '🎙️ Record';
+                        recordMemoButton.disabled = false;
+                        if (mediaRecorder && mediaRecorder.state === 'recording') {
+                            mediaRecorder.stop();
+                        }
+                    };
+
+                    speechRecognition.onend = () => {
+                        if (mediaRecorder && mediaRecorder.state !== 'inactive') { 
+                           // do nothing if mediaRecorder is still active
+                        } else {
+                            recordMemoButton.classList.remove('bg-red-600');
+                            recordMemoButton.textContent = '🎙️ Record';
+                            recordingStatus.classList.add('hidden');
+                            recordMemoButton.disabled = false;
+                        }
+                    };
+
+                    speechRecognition.start();
+                    console.log("Speech recognition started.");
+                } else {
+                    alert('Speech Recognition is not supported in this browser.');
+                    recordMemoButton.disabled = false;
+                    recordMemoButton.textContent = '🎙️ Record';
+                    stream.getTracks().forEach(track => track.stop());
+                    return;
+                }
+
+                recordMemoButton.textContent = 'Recording...';
+                recordMemoButton.classList.add('bg-red-600');
+                recordingStatus.classList.remove('hidden');
+                recordingStatus.textContent = 'Recording...';
+                recordMemoButton.disabled = false;
+            } catch (err) {
+                console.error('Failed to get microphone access:', err);
+                alert('Microphone access denied or failed: ' + err.message);
+                recordMemoButton.textContent = '🎙️ Record';
+                recordingStatus.classList.add('hidden');
+                recordMemoButton.disabled = false;
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                console.log("MediaRecorder stopped.");
+            }
+            if (speechRecognition) {
+                speechRecognition.stop();
+                console.log("SpeechRecognition stopped.");
+            }
+            recordMemoButton.classList.remove('bg-red-600');
+            recordMemoButton.textContent = '🎙️ Record';
+            recordingStatus.classList.add('hidden');
+            recordMemoButton.disabled = false;
+        }
+
+        function saveMemoToLocalStorage(content) {
+            if (!content.trim()) {
+                alert('Please enter some memo content.');
+                return;
+            }
+            let memos = loadMemosFromLocalStorage();
+            const newMemo = {
+                id: Date.now().toString(),
+                content: content,
+                timestamp: new Date().toLocaleString()
+            };
+            memos.push(newMemo);
+            localStorage.setItem(LOCAL_STORAGE_MEMO_KEY, JSON.stringify(memos));
+            alert('Memo saved successfully!');
+            hideQuickMemoModal();
+        }
+
+        function loadMemosFromLocalStorage() {
+            const memosJson = localStorage.getItem(LOCAL_STORAGE_MEMO_KEY);
+            return memosJson ? JSON.parse(memosJson) : [];
+        }
+
+        // --- Memo Rendering Function ---
+        function renderMemos() {
+            const memoList = document.getElementById('memo-list');
+            const suggestedVersesList = document.getElementById('suggested-verses');
+            const suggestedTitlesList = document.getElementById('suggested-titles');
+            const suggestionsArea = document.getElementById('suggestions-area');
+            
+            if (!memoList || !suggestedVersesList || !suggestedTitlesList || !suggestionsArea) {
+                console.warn('Memo list elements not found. Skipping memo rendering.');
+                return;
+            }
+
+            const storedMemos = loadMemosFromLocalStorage();
+
+            memoList.innerHTML = '';
+            suggestedVersesList.innerHTML = '';
+            suggestedTitlesList.innerHTML = '';
+            suggestionsArea.classList.add('hidden');
+
+            if (storedMemos.length === 0) {
+                memoList.innerHTML = '<li class="text-gray-400">No quick memos saved yet.</li>';
+                return;
+            }
+
+            storedMemos.forEach(memo => {
+                const li = document.createElement('li');
+                li.id = `memo-${memo.id}`;
+                li.className = 'memo-list-item p-4 bg-gray-700 hover:bg-gray-600 rounded-lg cursor-pointer transition';
+                li.innerHTML = `<strong>${memo.timestamp}</strong><br>${memo.content}`;
+                li.dataset.content = memo.content;
+
+                li.addEventListener('click', async () => {
+                    document.querySelectorAll('.memo-list-item').forEach(item => item.classList.remove('selected'));
+                    li.classList.add('selected');
+
+                    const selectedMemoContent = li.dataset.content;
+                    
+                    suggestionsArea.classList.remove('hidden');
+                    
+                    const generateButtonMemo = document.getElementById('generate-sermon-button-memo');
+                    showLoading(generateButtonMemo, true);
+                    generateButtonMemo.textContent = 'Getting AI suggestions...';
+
+                    try {
+                        const prompt = `Based on the following memo, suggest 3 highly relevant Bible verses (reference and full text) and 3 sermon titles.
+Memo: "${selectedMemoContent}"
+Format the response clearly with headings for "Suggested Verses" and "Suggested Titles".`;
+                            
+                        const aiResponse = await callGeminiApi(prompt);
+                        
+                        suggestedVersesList.innerHTML = '';
+                        suggestedTitlesList.innerHTML = '';
+
+                        const [versesSection, titlesSection] = aiResponse.split('Suggested Titles:');
+                        const suggestedVerses = versesSection.replace('Suggested Verses:', '').split('\n').filter(line => line.trim() !== '');
+                        const suggestedTitles = titlesSection.split('\n').filter(line => line.trim() !== '');
+                        
+                        suggestedVerses.forEach(verse => {
+                            const li = document.createElement('li');
+                            li.className = 'text-gray-300';
+                            li.textContent = verse.trim();
+                            suggestedVersesList.appendChild(li);
+                        });
+                        
+                        suggestedTitles.forEach(title => {
+                            const li = document.createElement('li');
+                            li.className = 'suggestion-item p-2 bg-gray-700 hover:bg-gray-600 rounded cursor-pointer transition';
+                            li.textContent = title.trim();
+                            li.dataset.title = title.trim();
+                            li.addEventListener('click', () => {
+                                document.querySelectorAll('.suggestion-item').forEach(item => item.classList.remove('selected'));
+                                li.classList.add('selected');
+                            });
+                            suggestedTitlesList.appendChild(li);
+                        });
+                        
+                    } catch (error) {
+                        console.error('Error getting AI suggestions:', error);
+                        suggestedVersesList.innerHTML = `<li class="text-red-400">Error: Failed to get AI suggestions.</li>`;
+                        suggestedTitlesList.innerHTML = '';
+                    } finally {
+                        showLoading(generateButtonMemo, false);
+                        generateButtonMemo.textContent = 'Generate Sermon with AI';
+                    }
+                });
+            });
+        }
+
+        // --- Page/Screen Management Functions ---
+        const landingPageSection = document.getElementById('landing-page-section');
+        const appSections = document.getElementById('app-sections');
+        const premiumScreen = document.getElementById('premium-screen');
+
+        function navigateTo(targetSectionId) {
+            landingPageSection.classList.add('hidden');
+            appSections.classList.add('hidden');
+            premiumScreen.classList.add('hidden');
+
+            if (targetSectionId === 'landing-page') {
+                landingPageSection.classList.remove('hidden');
+                document.getElementById('main-title').textContent = 'Welcome to SermonNote';
+                document.getElementById('main-description').textContent = 'Deepen Your Faith, Organize Your Insights.';
+            } else if (targetSectionId === 'app-login') {
+                appSections.classList.remove('hidden');
+                showScreen('login-screen');
+                isLoginMode = true;
+                updateAuthScreenUI();
+            } else if (targetSectionId === 'sermon-selection') {
+                appSections.classList.remove('hidden');
+                showScreen('sermon-selection-screen');
+            } else if (targetSectionId === 'show-premium') {
+                premiumScreen.classList.remove('hidden');
+                document.getElementById('main-title').textContent = 'Unlock Premium Features';
+                document.getElementById('main-description').textContent = 'Enhance your experience with exclusive tools.';
+            }
+        }
+
+        // --- Event Listeners for Combined Page ---
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOMContentLoaded fired. Initializing main script.");
+            // --- Firebase Auth & Login/Sign Up Logic (Global variables assigned here) ---
+            loginModalTitle = document.getElementById('login-modal-title');
+            authSubmitButton = document.getElementById('auth-submit-button');
+            toggleAuthModeButton = document.getElementById('toggle-auth-mode-button');
+            authErrorMessage = document.getElementById('auth-error-message');
+            emailInput = document.getElementById('email');
+            passwordInput = document.getElementById('password');
+            forgotPasswordButton = document.getElementById('forgot-password-button');
+
+            updateAuthScreenUI(); 
+
+            if (toggleAuthModeButton) {
+                toggleAuthModeButton.addEventListener('click', () => {
+                    isLoginMode = !isLoginMode;
+                    updateAuthScreenUI();
+                });
+            }
+
+            // Forgot Password Button Event Listener
+            if (forgotPasswordButton) {
+                forgotPasswordButton.addEventListener('click', async () => {
+                    const email = emailInput.value.trim();
+                    if (!email) {
+                        authErrorMessage.textContent = 'Please enter your email address to reset password.';
+                        authErrorMessage.classList.remove('hidden');
+                        return;
+                    }
+                    
+                    authErrorMessage.classList.add('hidden');
+
+                    try {
+                        await auth.sendPasswordResetEmail(email);
+                        alert(`Password reset email sent to ${email}. Please check your inbox.`);
+                        emailInput.value = '';
+                    } catch (error) {
+                        console.error("Password reset error:", error);
+                        let errorMessage = 'Failed to send password reset email. Please try again.';
+                        if (error.code) {
+                            switch (error.code) {
+                                case 'auth/invalid-email':
+                                    errorMessage = 'The email address is not valid.';
+                                    break;
+                                case 'auth/user-not-found':
+                                    errorMessage = 'No user found with that email address.';
+                                    break;
+                                default:
+                                    errorMessage = `Error: ${error.message}`;
+                            }
+                        }
+                        authErrorMessage.textContent = errorMessage;
+                        authErrorMessage.classList.remove('hidden');
+                    } finally {
+                        showLoading(authSubmitButton, false);
+                    }
+                });
+            }
+
+            const loginForm = document.getElementById('login-form');
+
+            if(loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    authErrorMessage.classList.add('hidden');
+                    const email = emailInput.value;
+                    const password = passwordInput.value;
+
+                    if (!email || !password) {
+                        authErrorMessage.textContent = 'Please enter both email and password.';
+                        authErrorMessage.classList.remove('hidden');
+                        return;
+                    }
+
+                    showLoading(authSubmitButton, true);
+
+                    try {
+                        if (isLoginMode) {
+                            await auth.signInWithEmailAndPassword(email, password);
+                            alert('Login successful!');
+                            navigateTo('sermon-selection');
+                        } else {
+                            await auth.createUserWithEmailAndPassword(email, password);
+                            alert('Sign Up successful! You are now logged in.');
+                            navigateTo('sermon-selection');
+                        }
+                    } catch (error) {
+                        console.error("Authentication error:", error);
+                        let errorMessage = 'Authentication failed. Please try again.';
+                        if (error.code) {
+                            switch (error.code) {
+                                case 'auth/email-already-in-use':
+                                    errorMessage = 'The email address is already in use by another account.';
+                                    break;
+                                case 'auth/invalid-email':
+                                    errorMessage = 'The email address is not valid.';
+                                    break;
+                                case 'auth/operation-not-allowed':
+                                    errorMessage = 'Email/password accounts are not enabled. Please enable them in Firebase Console.';
+                                    break;
+                                case 'auth/weak-password':
+                                    errorMessage = 'The password is too weak. Please use at least 6 characters.';
+                                    break;
+                                case 'auth/user-disabled':
+                                    errorMessage = 'This user account has been disabled.';
+                                    break;
+                                case 'auth/user-not-found':
+                                case 'auth/wrong-password':
+                                    errorMessage = 'Invalid email or password.';
+                                    break;
+                                case 'auth/invalid-credential':
+                                    errorMessage = 'Invalid email or password.';
+                                    break;
+                                default:
+                                    errorMessage = `Error: ${error.message}`;
+                            }
+                        }
+                        authErrorMessage.textContent = errorMessage;
+                        authErrorMessage.classList.remove('hidden');
+                    } finally {
+                        showLoading(authSubmitButton, false);
+                    }
+                });
+            }
+
+
+            // --- Initial Screen Load & URL Handling (Auth State Changed listener) ---
+            // Firebase authentication state listener for initial routing
+            auth.onAuthStateChanged(user => {
+                console.log("Auth state changed. User:", user ? user.email : "none");
+                const path = window.location.pathname;
+                const hash = window.location.hash;
+
+                if (user) {
+                    console.log("User already logged in, routing based on path.");
+                    if (path.startsWith('/app') || path.startsWith('/login') || hash === '#app' || hash === '#login') {
+                        navigateTo('sermon-selection');
+                    } else if (path.startsWith('/premium') || hash === '#premium') {
+                        navigateTo('show-premium');
+                    } else {
+                        navigateTo('landing-page');
+                    }
+                } else {
+                    console.log("No user logged in, routing based on path.");
+                    if (path.startsWith('/app') || path.startsWith('/login') || hash === '#app' || hash === '#login') {
+                        navigateTo('app-login');
+                    } else if (path.startsWith('/premium') || hash === '#premium') {
+                        navigateTo('show-premium');
+                    } else {
+                        navigateTo('landing-page');
+                        window.history.replaceState(null, '', '/');
+                    }
+                }
+            });
+
+
+            // --- Event Listeners for Landing Page Buttons ---
+            const headerAuthButton = document.getElementById('header-auth-button');
+            const mobileAuthButton = document.getElementById('mobile-auth-button');
+            const landingMainAuthButton = document.getElementById('landing-main-auth-button');
+            const landingPremiumButton = document.getElementById('landing-premium-button');
+            const landingQuickMemoButton = document.getElementById('landing-quick-memo-button');
+
+            if (headerAuthButton) headerAuthButton.addEventListener('click', () => navigateTo('app-login'));
+            if (mobileAuthButton) mobileAuthButton.addEventListener('click', () => navigateTo('app-login'));
+            if (landingMainAuthButton) landingMainAuthButton.addEventListener('click', () => navigateTo('app-login'));
+            
+            if (landingPremiumButton) landingPremiumButton.addEventListener('click', () => navigateTo('show-premium'));
+            
+            if (landingQuickMemoButton) landingQuickMemoButton.addEventListener('click', () => {
+                console.log("Landing Quick Memo button clicked.");
+                showQuickMemoModal();
+            });
+
+            // Navigational links within landing page sections (scroll behavior)
+            document.getElementById('nav-features-link')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                landingPageSection.classList.remove('hidden');
+                appSections.classList.add('hidden');
+                premiumScreen.classList.add('hidden');
+                document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' });
+            });
+            document.getElementById('nav-benefits-link')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                landingPageSection.classList.remove('hidden');
+                appSections.classList.add('hidden');
+                premiumScreen.classList.add('hidden');
+                document.getElementById('benefits-section')?.scrollIntoView({ behavior: 'smooth' });
+            });
+             document.getElementById('mobile-nav-features-link')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                mobileMenu.classList.remove('active');
+                landingPageSection.classList.remove('hidden');
+                appSections.classList.add('hidden');
+                premiumScreen.classList.add('hidden');
+                document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' });
+            });
+            document.getElementById('mobile-nav-benefits-link')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                mobileMenu.classList.remove('active');
+                landingPageSection.classList.remove('hidden');
+                appSections.classList.add('hidden');
+                premiumScreen.classList.add('hidden');
+                document.getElementById('benefits-section')?.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Mobile Menu Toggles
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const closeMobileMenuButton = document.getElementById('close-mobile-menu-button');
+
+            if (mobileMenuButton && mobileMenu && closeMobileMenuButton) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.add('active');
+                });
+                closeMobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                });
+            }
+
+            // Features Card Click on Landing Page
+            document.querySelectorAll('#features-section .feature-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    console.log("Feature card clicked, navigating to app-login.");
+                    navigateTo('app-login');
+                });
+            });
+
+            // Dynamic Bible Verse Logic for Landing Page
+            const bibleVerseDisplay = document.getElementById('bible-verse-display');
+            const bibleVerses = [
+                "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life. - John 3:16",
+                "I can do all things through Christ who strengthens me. - Philippians 4:13",
+                "The Lord is my shepherd; I shall not want. - Psalm 23:1",
+                "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go. - Joshua 1:9",
+                "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight. - Proverbs 3:5-6"
+            ];
+            function displayRandomVerse() {
+                if (bibleVerseDisplay) {
+                    const randomIndex = Math.floor(Math.random() * bibleVerses.length);
+                    bibleVerseDisplay.textContent = bibleVerses[randomIndex];
+                }
+            }
+            displayRandomVerse();
+
+            // --- App-specific Event Listeners (from your provided code) ---
+            const sermonSelectionScreen = document.getElementById('sermon-selection-screen');
+            const sermonAssistantScreen = document.getElementById('sermon-assistant-screen');
+            const expositorySermonScreen = document.getElementById('expository-sermon-screen');
+            const realLifeSermonScreen = document.getElementById('real-life-sermon-screen');
+            const quickMemoSermonScreen = document.getElementById('quick-memo-sermon-screen');
+            
+            // Sermon Selection Buttons
+            const assistantButton = document.getElementById('btn-assistant');
+            const expositoryButton = document.getElementById('btn-expository');
+            const realLifeButton = document.getElementById('btn-real-life');
+            const linkedButton = document.getElementById('btn-linked');
+            
+            // Back Buttons
+            const backButtonAssistant = document.getElementById('back-button-assistant');
+            const backButtonExpository = document.getElementById('back-button-expository');
+            const backButtonRealLife = document.getElementById('back-button-real-life');
+            const backButtonMemo = document.getElementById('back-button-memo');
+            
+            // Back to Landing Button (from Sermon Selection Screen)
+            const backToLandingButton = document.getElementById('back-to-landing-button');
+            if (backToLandingButton) {
+                backToLandingButton.addEventListener('click', () => {
+                    console.log("Back to Landing button clicked.");
+                    navigateTo('landing-page');
+                });
+            }
+
+            // Fullscreen buttons
+            const fullscreenButtonAssistant = document.getElementById('fullscreen-button-assistant');
+            const fullscreenButtonExpository = document.getElementById('fullscreen-button-expository');
+            const fullscreenButtonRealLife = document.getElementById('fullscreen-button-real-life');
+            const fullscreenButtonMemo = document.getElementById('fullscreen-button-memo');
+            
+            const modalCloseBtn = document.getElementById('close-modal-btn');
+            const modalFooterCloseBtn = document.getElementById('modal-close-btn-footer');
+            const saveSermonButton = document.getElementById('save-sermon-button');
+            const printSermonButton = document.getElementById('print-sermon-button');
+
+            // Sermon Assistant Elements
+            const aiInput = document.getElementById('ai-input');
+            const getCommentaryButton = document.getElementById('get-commentary-button');
+            const generateSermonButton = document.getElementById('generate-sermon-button');
+            const commentaryOutput = document.getElementById('commentary-output');
+            const sermonOutput = document.getElementById('sermon-output');
+            
+            // Expository Sermon Elements
+            const expositoryVerseInput = document.getElementById('expository-verse-input');
+            const expositoryLookupButton = document.getElementById('expository-lookup-button');
+            const expositoryGenerateButton = document.getElementById('expository-generate-button');
+            const expositoryScriptureOutput = document.getElementById('expository-scripture-output');
+            const expositoryCommentaryOutput = document.getElementById('expository-commentary-output');
+            const expositorySermonOutput = document.getElementById('expository-sermon-output');
+            
+            // Real-Life Sermon Elements
+            const realLifeNotesInput = document.getElementById('real-life-notes-input');
+            const realLifeSuggestionsOutput = document.getElementById('real-life-suggestions-output');
+            const getRealLifeSuggestionsButton = document.getElementById('get-real-life-suggestions-button'); // Corrected variable name
+            const realLifeGenerateButton = document.getElementById('real-life-generate-button');
+            const realLifeSermonOutput = document.getElementById('real-life-sermon-output');
+            
+            // Quick Memo Sermon Elements
+            const memoList = document.getElementById('memo-list');
+            const memoSermonOutput = document.getElementById('memo-sermon-output');
+            const suggestedVersesList = document.getElementById('suggested-verses');
+            const suggestedTitlesList = document.getElementById('suggested-titles');
+            const generateSermonButtonMemo = document.getElementById('generate-sermon-button-memo');
+
+            // Event listeners for sermon type selection
+            if(assistantButton) assistantButton.addEventListener('click', () => {
+                console.log("Sermon Assistant button clicked.");
+                showScreen('sermon-assistant-screen');
+            });
+            if(expositoryButton) expositoryButton.addEventListener('click', () => {
+                console.log("Expository Sermon button clicked.");
+                showScreen('expository-sermon-screen');
+            });
+            if(realLifeButton) realLifeButton.addEventListener('click', () => {
+                console.log("Real-Life Application Sermon button clicked.");
+                showScreen('real-life-sermon-screen');
+            });
+            if(linkedButton) linkedButton.addEventListener('click', () => {
+                console.log("Quick Memo Linked Sermon button clicked.");
+                showScreen('quick-memo-sermon-screen'); renderMemos();
+            });
+            
+            // Back buttons
+            if(backButtonAssistant) backButtonAssistant.addEventListener('click', () => showScreen('sermon-selection-screen'));
+            if(backButtonExpository) backButtonExpository.addEventListener('click', () => showScreen('sermon-selection-screen'));
+            if(backButtonRealLife) backButtonRealLife.addEventListener('click', () => showScreen('sermon-selection-screen'));
+            if(backButtonMemo) backButtonMemo.addEventListener('click', () => showScreen('sermon-selection-screen'));
+            
+            // Fullscreen buttons
+            if(fullscreenButtonAssistant) {
+                fullscreenButtonAssistant.addEventListener('click', () => {
+                    const content = sermonOutput.value;
+                    showFullscreenModal('Sermon Assistant Output', content);
+                });
+            }
+            if(fullscreenButtonExpository) {
+                fullscreenButtonExpository.addEventListener('click', () => {
+                    const content = expositorySermonOutput.value;
+                    showFullscreenModal('Expository Sermon Output', content);
+                });
+            }
+            if(fullscreenButtonRealLife) {
+                fullscreenButtonRealLife.addEventListener('click', () => {
+                    const content = realLifeSermonOutput.value;
+                    showFullscreenModal('Real-Life Sermon Output', content);
+                });
+            }
+            if(fullscreenButtonMemo) {
+                fullscreenButtonMemo.addEventListener('click', () => {
+                    const content = memoSermonOutput.value;
+                    showFullscreenModal('Quick Memo Sermon Output', content);
+                });
+            }
+            
+            // Modal close buttons
+            if(modalCloseBtn) modalCloseBtn.addEventListener('click', hideFullscreenModal);
+            if(modalFooterCloseBtn) modalFooterCloseBtn.addEventListener('click', hideFullscreenModal);
+
+            // Save Sermon Button Event Listener
+            if(saveSermonButton) {
+                saveSermonButton.addEventListener('click', () => {
+                    const sermonContent = document.getElementById('fullscreen-textarea').value;
+                    const modalCurrentTitle = document.getElementById('modal-title').textContent;
+                    console.log(`Saving sermon: ${modalCurrentTitle}\nContent:\n${sermonContent}`);
+                    alert(`"${modalCurrentTitle}" Sermon saved! (This feature will be fully integrated with Firebase Firestore.)`);
+                });
+            }
+
+            // Print Sermon Button Event Listener
+            if(printSermonButton) {
+                printSermonButton.addEventListener('click', () => {
+                    const sermonContent = document.getElementById('fullscreen-textarea').value;
+                    const modalCurrentTitle = document.getElementById('modal-title').textContent;
+                    
+                    const printWindow = window.open('', '', 'height=600,width=800');
+                    if (printWindow) {
+                        printWindow.document.write('<html><head><title>' + modalCurrentTitle + '</title>');
+                        printWindow.document.write('<style>');
+                        printWindow.document.write(`
+                            body { font-family: 'Inter', sans-serif; margin: 20px; color: black; background-color: white; }
+                            h1 { font-size: 24pt; text-align: center; margin-bottom: 20px; }
+                            pre { white-space: pre-wrap; word-wrap: break-word; font-size: 11pt; line-height: 1.5; }
+                        `);
+                        printWindow.document.write('</style></head><body>');
+                        printWindow.document.write('<h1>' + modalCurrentTitle + '</h1>');
+                        printWindow.document.write('<pre>' + sermonContent + '</pre>');
+                        printWindow.document.write('</body></html>');
+                        printWindow.document.close();
+                        printWindow.print();
+                    } else {
+                        alert('Please allow pop-ups for printing.');
+                    }
+                });
+            }
+
+            // Quick Memo Popup Event Listeners
+            if (recordMemoButton) {
+                recordMemoButton.addEventListener('click', () => {
+                    if (mediaRecorder && mediaRecorder.state === 'recording') {
+                        stopRecording();
+                        recordMemoButton.textContent = '🎙️ Record';
+                        recordingStatus.classList.add('hidden');
+                        alert('Recording stopped.');
+                    } else {
+                        startRecording();
+                    }
+                });
+            }
+
+            if (saveQuickMemoButton) {
+                saveQuickMemoButton.addEventListener('click', () => {
+                    saveMemoToLocalStorage(quickMemoTextarea.value);
+                });
+            }
+
+            if (closeQuickMemoModalButton) {
+                closeQuickMemoModalButton.addEventListener('click', hideQuickMemoModal);
+            }
+            if (cancelQuickMemoButton) {
+                cancelQuickMemoButton.addEventListener('click', hideQuickMemoModal);
+            }
+        });
+    </script>
+</body>
+</html>

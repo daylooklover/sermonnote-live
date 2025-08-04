@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-900">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SermonNote - Deepen Your Faith, Organize Your Insights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* 최소한의 커스텀 스타일만 유지 (Tailwind로 대체하기 어려운 부분) */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .header-logo {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        .feature-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+        }
+        .verse-display-area {
+            border: 2px solid #10B981;
+            font-size: 1.125rem;
+            font-style: italic;
+            text-align: center;
+        }
+        /* Mobile menu styles: JavaScript 토글을 위한 CSS 유지 */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%); /* 기본적으로 숨겨진 상태 */
+        }
+        #mobile-menu.active {
+            transform: translateX(0); /* 활성화 시 보임 */
+        }
+    </style>
+</head>
+<body class="text-gray-100 antialiased">
+    <header class="bg-gray-900 shadow-md fixed w-full z-10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="https://placehold.co/40x40/333/fff?text=SN" alt="SermonNote Logo" class="header-logo">
+                <span class="text-xl font-bold text-gray-300">SermonNote</span>
+            </div>
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav class="hidden md:flex items-center space-x-4">
+                <a href="#features-section" class="text-gray-300 hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">Features</a>
+                <a href="#benefits-section" class="text-gray-300 hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium">Why SermonNote?</a>
+                <button onclick="window.location.href='/app';" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">Sign Up / Login</button>
+            </nav>
+        </div>
+        <div id="mobile-menu" class="md:hidden fixed top-0 right-0 h-full w-64 bg-gray-800 p-6 shadow-lg z-20">
+            <div class="flex justify-end mb-4">
+                <button id="close-mobile-menu-button" class="text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <nav class="flex flex-col space-y-4">
+                <a href="#features-section" class="text-gray-300 hover:text-blue-400 text-lg font-medium py-2 border-b border-gray-700">Features</a>
+                <a href="#benefits-section" class="text-gray-300 hover:text-blue-400 text-lg font-medium py-2 border-b border-gray-700">Why SermonNote?</a>
+                <button onclick="window.location.href='/app';" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 mt-4">Sign Up / Login</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 pt-24 pb-12 flex flex-col items-center">
+        <section id="hero-section" class="text-center py-12">
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight">SermonNote</h1>
+            <p class="mt-4 text-xl md:text-2xl font-light text-gray-400">Deepen Your Faith, Organize Your Insights.</p>
+            <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-8">
+                <button onclick="window.location.href='/app';" class="bg-blue-600 hover:bg-blue-700 text-white py-4 px-8 rounded-lg text-xl font-bold transition duration-300 shadow-lg">Sign Up / Login</button>
+                <button onclick="window.location.href='/app';" class="bg-green-500 hover:bg-green-600 text-white py-4 px-8 rounded-lg text-xl font-bold transition duration-300 shadow-lg">Go Premium</button>
+                <button onclick="window.location.href='/app';" class="bg-amber-400 hover:bg-amber-500 text-gray-900 py-4 px-8 rounded-lg text-xl font-bold transition duration-300 shadow-lg">Quick Memo</button>
+            </div>
+        </section>
+
+        <section id="features-section" class="w-full max-w-5xl mt-16">
+            <h2 class="text-3xl font-bold text-center text-blue-500 mb-8">Our Unique Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center">
+                    <h3 class="text-xl font-semibold text-blue-300 mb-2">AI-Powered Insights</h3>
+                    <p class="text-gray-400">Leverage advanced AI to generate commentary, insights, and sermon drafts from any scripture or topic.</p>
+                </div>
+                <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center">
+                    <h3 class="text-xl font-semibold text-blue-300 mb-2">Expository Sermon Creation</h3>
+                    <p class="text-gray-400">Dive deep into biblical truth with a structured tool for creating expository sermons.</p>
+                </div>
+                <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center">
+                    <h3 class="text-xl font-semibold text-blue-300 mb-2">Real-Life Application</h3>
+                    <p class="text-gray-400">Connect scripture to daily life events with AI-suggested verses and themes for practical sermons.</p>
+                </div>
+                <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center">
+                    <h3 class="text-xl font-semibold text-blue-300 mb-2">Quick Memo Integration</h3>
+                    <p class="text-gray-400">Seamlessly transform scattered notes and voice memos into cohesive sermon outlines.</p>
+                </div>
+                <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center">
+                    <h3 class="text-xl font-semibold text-blue-300 mb-2">Secure & Organized</h3>
+                    <p class="text-gray-400">Keep all your spiritual insights, notes, and sermons organized and securely stored.</p>
+                </div>
+                <div class="feature-card bg-gray-800 p-6 rounded-xl shadow-xl text-center">
+                    <h3 class="text-xl font-semibold text-blue-300 mb-2">Community Sharing (Optional)</h3>
+                    <p class="text-gray-400">Share insights and grow with a community of fellow believers and leaders.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="benefits-section" class="w-full max-w-4xl mt-16 text-center">
+            <h2 class="text-3xl font-bold text-blue-500 mb-8">Why SermonNote?</h2>
+            <ul class="text-lg space-y-4 text-gray-300">
+                <li>Streamline your sermon preparation process.</li>
+                <li>Enhance your understanding of the Bible with AI assistance.</li>
+                <li>Keep all your spiritual insights organized in one place.</li>
+                <li>Grow in faith with a dedicated study companion.</li>
+            </ul>
+        </section>
+
+        <section id="verse-section" class="w-full max-w-3xl mt-16">
+            <h3 class="text-2xl font-bold text-center text-green-500 mb-4">Verse of the Moment</h3>
+            <div id="bible-verse-display" class="verse-display-area min-h-20 flex items-center justify-center p-6 bg-gray-800 rounded-lg text-lg">
+                Loading a verse...
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-500 py-8 text-center mt-16">
+        <div class="container mx-auto px-6">
+            <p>&copy; 2025 SermonNote. All rights reserved.</p>
+            <div class="flex justify-center space-x-6 mt-4">
+                <a href="#" class="hover:text-white transition duration-300">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition duration-300">Terms of Service</a>
+                <a href="#" class="hover:text-white transition duration-300">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggles
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMobileMenuButton = document.getElementById('close-mobile-menu-button');
+
+        if (mobileMenuButton && mobileMenu && closeMobileMenuButton) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.add('active'); // active 클래스 추가하여 보이게 함
+            });
+
+            closeMobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.remove('active'); // active 클래스 제거하여 숨김
+            });
+        }
+
+
+        // Features Card Click (alert 대신 실제 페이지 이동 로직으로 변경 필요)
+        // 이 부분은 랜딩 페이지에서는 단순히 정보 제공이므로, 클릭 시 /app으로 이동하도록 변경하거나,
+        // alert()를 유지하거나, 아예 클릭 이벤트를 제거할 수 있습니다.
+        // 현재는 앱의 main 페이지로 이동하도록 설정합니다.
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', () => {
+                window.location.href = '/app'; // 클릭 시 앱의 메인 페이지로 이동
+            });
+        });
+
+
+        // Dynamic Bible Verse Logic (Need a Bible API)
+        const bibleVerseDisplay = document.getElementById('bible-verse-display');
+        const bibleVerses = [
+            "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life. - John 3:16",
+            "I can do all things through Christ who strengthens me. - Philippians 4:13",
+            "The Lord is my shepherd; I shall not want. - Psalm 23:1",
+            "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go. - Joshua 1:9",
+            "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight. - Proverbs 3:5-6"
+        ];
+
+        function displayRandomVerse() {
+            if (bibleVerseDisplay) {
+                const randomIndex = Math.floor(Math.random() * bibleVerses.length);
+                bibleVerseDisplay.textContent = bibleVerses[randomIndex];
+            }
+        }
+
+        // Display a random verse on page load
+        displayRandomVerse();
+        // Optionally, change verse every X seconds
+        // setInterval(displayRandomVerse, 10000); // 10초마다 변경
+    </script>
+
+    </body>
+</html>
