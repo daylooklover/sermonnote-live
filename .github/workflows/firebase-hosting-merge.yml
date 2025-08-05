@@ -11,7 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci && npm run build
+      # ⭐ 이 부분을 수정했습니다.
+      - name: Install dependencies in functions directory
+        run: npm ci
+        working-directory: ./functions
+      - name: Build and deploy
+        run: npm run build
+        working-directory: ./functions
+      # ⭐ 여기까지만 수정하면 됩니다.
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
