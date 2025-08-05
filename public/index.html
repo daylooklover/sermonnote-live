@@ -350,7 +350,7 @@
 
             <div id="sermon-selection-screen" class="hidden w-full max-w-4xl mt-12 grid grid-cols-1 md:grid-cols-4 gap-6 relative">
                  <button id="back-to-landing-button" class="absolute top-0 left-0 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
-                    ← 이전 화면
+                    ← Back
                 </button>
                 
                 <button id="btn-assistant" class="sermon-type-button">
@@ -523,16 +523,16 @@
             </div>
             <div class="modal-footer flex justify-end space-x-4 print-button-group">
                 <button id="edit-sermon-button" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300">
-                    수정
+                    Edit
                 </button>
                 <button id="save-edited-sermon-button" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300 hidden">
-                    저장
+                    Save
                 </button>
                 <button id="print-sermon-button" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300">
-                    인쇄
+                    Print
                 </button>
                 <button id="modal-close-btn-footer" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition duration-300">
-                    닫기
+                    Close
                 </button>
             </div>
         </div>
@@ -542,7 +542,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="text-xl font-bold">Quick Memo</h3>
-                <span id="memo-count" class="text-gray-400">오늘 메모: 0/5</span>
+                <span id="memo-count" class="text-gray-400">Today's Memos: 0/5</span>
                 <button id="close-quick-memo-modal-btn" class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
             </div>
             <div class="modal-body">
@@ -658,8 +658,9 @@
 
         async function callGeminiApi(prompt) {
             console.log("Sending prompt to Gemini API:", prompt);
-            if (!apiKey || apiKey === "YOUR_ACTUAL_GEMINI_API_KEY_HERE") {
-                throw new Error("Gemini API Key is not set. Please set the 'apiKey' variable in the script.");
+            // ⭐ API 키가 유효한지 확인하는 로직
+            if (!apiKey || apiKey === "AIzaSyD4qxYQf7BXy4q8aP8Hyd-fif_WdGC8w2E") {
+                 throw new Error("Gemini API Key is not set or invalid.");
             }
 
             const payload = {
@@ -790,7 +791,7 @@
                 const today = new Date().toDateString();
                 let memos = loadMemosFromLocalStorage();
                 const todayMemos = memos.filter(memo => new Date(memo.timestamp).toDateString() === today);
-                document.getElementById('memo-count').textContent = `오늘 메모: ${todayMemos.length}/5`;
+                document.getElementById('memo-count').textContent = `Today's Memos: ${todayMemos.length}/5`;
             }
         }
 
@@ -912,7 +913,7 @@
         // ⭐ 수정된 부분: 일일 메모 제한 기능 포함 ⭐
         function saveMemoToLocalStorage(content) {
             if (!content.trim()) {
-                alert('메모 내용을 입력해 주세요.');
+                alert('Please enter some memo content.');
                 return;
             }
 
@@ -922,7 +923,7 @@
             const todayMemos = memos.filter(memo => new Date(memo.timestamp).toDateString() === today);
 
             if (todayMemos.length >= 5) {
-                alert('오늘 저장할 수 있는 퀵메모는 최대 5개까지입니다.');
+                alert('You can only save up to 5 quick memos per day.');
                 return;
             }
 
@@ -933,7 +934,7 @@
             };
             memos.push(newMemo);
             localStorage.setItem(LOCAL_STORAGE_MEMO_KEY, JSON.stringify(memos));
-            alert('메모가 성공적으로 저장되었습니다!');
+            alert('Memo saved successfully!');
             hideQuickMemoModal();
             renderMemos(); // 저장 후 퀵메모 리스트를 새로고침합니다.
         }
@@ -1192,28 +1193,20 @@ Format the response clearly with headings for "Suggested Verses" and "Suggested 
             // Firebase authentication state listener for initial routing
             auth.onAuthStateChanged(user => {
                 console.log("Auth state changed. User:", user ? user.email : "none");
+
+                // ⭐ 이 부분을 수정하여 페이지 로딩 시 초기 화면을 올바르게 표시합니다.
                 const path = window.location.pathname;
                 const hash = window.location.hash;
 
                 if (user) {
-                    console.log("User already logged in, routing based on path.");
-                    if (path.startsWith('/app') || path.startsWith('/login') || hash === '#app' || hash === '#login') {
-                        navigateTo('sermon-selection');
-                    } else if (path.startsWith('/premium') || hash === '#premium') {
-                        navigateTo('show-premium');
-                    } else {
-                        navigateTo('landing-page');
-                    }
+                    console.log("User already logged in, routing to sermon selection screen.");
+                    document.getElementById('landing-page-section').classList.add('hidden');
+                    document.getElementById('app-sections').classList.remove('hidden');
+                    showScreen('sermon-selection-screen');
                 } else {
-                    console.log("No user logged in, routing based on path.");
-                    if (path.startsWith('/app') || path.startsWith('/login') || hash === '#app' || hash === '#login') {
-                        navigateTo('app-login');
-                    } else if (path.startsWith('/premium') || hash === '#premium') {
-                        navigateTo('show-premium');
-                    } else {
-                        navigateTo('landing-page');
-                        window.history.replaceState(null, '', '/');
-                    }
+                    console.log("No user logged in, showing landing page.");
+                    document.getElementById('landing-page-section').classList.remove('hidden');
+                    document.getElementById('app-sections').classList.add('hidden');
                 }
             });
 
@@ -1327,7 +1320,7 @@ Format the response clearly with headings for "Suggested Verses" and "Suggested 
             const realLifeButton = document.getElementById('btn-real-life');
             const linkedButton = document.getElementById('btn-linked');
             
-            // Back Buttons
+            // Back buttons
             const backButtonAssistant = document.getElementById('back-button-assistant');
             const backButtonExpository = document.getElementById('back-button-expository');
             const backButtonRealLife = document.getElementById('back-button-real-life');
@@ -1354,203 +1347,215 @@ Format the response clearly with headings for "Suggested Verses" and "Suggested 
             const printSermonButton = document.getElementById('print-sermon-button');
 
             // Sermon Assistant Elements
+            // ⭐ 변수 선언을 한 번만 하도록 수정 (이전에 발견된 오류)
             const aiInput = document.getElementById('ai-input');
             const getCommentaryButton = document.getElementById('get-commentary-button');
             const generateSermonButton = document.getElementById('generate-sermon-button');
             const commentaryOutput = document.getElementById('commentary-output');
             const sermonOutput = document.getElementById('sermon-output');
             
-            // Expository Sermon Elements
+            if(getCommentaryButton) {
+                getCommentaryButton.addEventListener('click', async () => {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('Please log in to use this feature.');
+                        return;
+                    }
+                    const verseInput = aiInput.value.trim();
+                    if (!verseInput) {
+                        alert('Please enter a topic, question, or Bible verse.');
+                        return;
+                    }
+                    showLoading(getCommentaryButton, true);
+                    try {
+                        const prompt = `Provide a detailed commentary on the following: ${verseInput}`;
+                        const commentary = await callGeminiApi(prompt);
+                        commentaryOutput.value = commentary;
+                    } catch (error) {
+                        commentaryOutput.value = `Error: ${error.message}`;
+                    } finally {
+                        showLoading(getCommentaryButton, false);
+                    }
+                });
+            }
+            if(generateSermonButton) {
+                generateSermonButton.addEventListener('click', async () => {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('Please log in to use this feature.');
+                        return;
+                    }
+                    const input = aiInput.value.trim();
+                    if (!input) {
+                        alert('Please enter a topic, question, or Bible verse.');
+                        return;
+                    }
+                    showLoading(generateSermonButton, true);
+                    try {
+                        const prompt = `Generate a full sermon based on the following: ${input}`;
+                        const sermon = await callGeminiApi(prompt);
+                        sermonOutput.value = sermon;
+                    } catch (error) {
+                        sermonOutput.value = `Error: ${error.message}`;
+                    } finally {
+                        showLoading(generateSermonButton, false);
+                    }
+                });
+            }
+
+
+            // Expository Sermon Buttons
+            // ⭐ 변수 선언을 한 번만 하도록 수정 (이전에 발견된 오류)
             const expositoryVerseInput = document.getElementById('expository-verse-input');
             const expositoryLookupButton = document.getElementById('expository-lookup-button');
             const expositoryGenerateButton = document.getElementById('expository-generate-button');
             const expositoryScriptureOutput = document.getElementById('expository-scripture-output');
             const expositoryCommentaryOutput = document.getElementById('expository-commentary-output');
             const expositorySermonOutput = document.getElementById('expository-sermon-output');
-            
-            // Real-Life Sermon Elements
+
+            if(expositoryLookupButton) {
+                expositoryLookupButton.addEventListener('click', async () => {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('Please log in to use this feature.');
+                        return;
+                    }
+                    const verse = expositoryVerseInput.value.trim();
+                    if (!verse) {
+                        alert('Please enter a Bible verse.');
+                        return;
+                    }
+                    showLoading(expositoryLookupButton, true);
+                    try {
+                        const prompt = `Provide the full scripture text for ${verse}.`;
+                        const scripture = await callGeminiApi(prompt);
+                        expositoryScriptureOutput.value = scripture;
+                    } catch (error) {
+                        expositoryScriptureOutput.value = `Error: ${error.message}`;
+                    } finally {
+                        showLoading(expositoryLookupButton, false);
+                    }
+                });
+            }
+            if(expositoryGenerateButton) {
+                expositoryGenerateButton.addEventListener('click', async () => {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('Please log in to use this feature.');
+                        return;
+                    }
+                    const verse = expositoryVerseInput.value.trim();
+                    const scripture = expositoryScriptureOutput.value.trim();
+                    if (!verse || !scripture) {
+                        alert('Please look up the scripture first.');
+                        return;
+                    }
+                    showLoading(expositoryGenerateButton, true);
+                    try {
+                        const prompt = `Generate a detailed expository sermon on the verse ${verse}, using the following scripture text: "${scripture}".`;
+                        const sermon = await callGeminiApi(prompt);
+                        expositorySermonOutput.value = sermon;
+                    } catch (error) {
+                        expositorySermonOutput.value = `Error: ${error.message}`;
+                    } finally {
+                        showLoading(expositoryGenerateButton, false);
+                    }
+                });
+            }
+
+
+            // Real-Life Sermon Buttons
+            // ⭐ 변수 선언을 한 번만 하도록 수정 (이전에 발견된 오류)
             const realLifeNotesInput = document.getElementById('real-life-notes-input');
-            const realLifeSuggestionsOutput = document.getElementById('real-life-suggestions-output');
-            const getRealLifeSuggestionsButton = document.getElementById('get-real-life-suggestions-button'); // Corrected variable name
+            const realLifeSuggestButton = document.getElementById('real-life-suggest-button');
             const realLifeGenerateButton = document.getElementById('real-life-generate-button');
+            const realLifeSuggestionsOutput = document.getElementById('real-life-suggestions-output');
             const realLifeSermonOutput = document.getElementById('real-life-sermon-output');
             
-            // Quick Memo Sermon Elements
+            if(realLifeSuggestButton) {
+                realLifeSuggestButton.addEventListener('click', async () => {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('Please log in to use this feature.');
+                        return;
+                    }
+                    const topic = realLifeNotesInput.value.trim();
+                    if (!topic) {
+                        alert('Please enter a real-life event or topic.');
+                        return;
+                    }
+                    showLoading(realLifeSuggestButton, true);
+                    try {
+                        const prompt = `Based on the following real-life topic: "${topic}", suggest 3 highly relevant Bible verses (reference and full text) and 3 sermon themes.`;
+                        const suggestions = await callGeminiApi(prompt);
+                        realLifeSuggestionsOutput.value = suggestions;
+                    } catch (error) {
+                        realLifeSuggestionsOutput.value = `Error: ${error.message}`;
+                    } finally {
+                        showLoading(realLifeSuggestButton, false);
+                    }
+                });
+            }
+            if(realLifeGenerateButton) {
+                realLifeGenerateButton.addEventListener('click', async () => {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('Please log in to use this feature.');
+                        return;
+                    }
+                    const suggestions = realLifeSuggestionsOutput.value.trim();
+                    if (!suggestions) {
+                        alert('Please get AI suggestions first.');
+                        return;
+                    }
+                    showLoading(realLifeGenerateButton, true);
+                    try {
+                        const prompt = `Generate a sermon using the following AI suggestions: "${suggestions}".`;
+                        const sermon = await callGeminiApi(prompt);
+                        realLifeSermonOutput.value = sermon;
+                    } catch (error) {
+                        realLifeSermonOutput.value = `Error: ${error.message}`;
+                    } finally {
+                        showLoading(realLifeGenerateButton, false);
+                    }
+                });
+            }
+
+            // Quick Memo Sermon Buttons
+            // ⭐ 변수 선언을 한 번만 하도록 수정 (이전에 발견된 오류)
             const memoList = document.getElementById('memo-list');
             const memoSermonOutput = document.getElementById('memo-sermon-output');
             const suggestedVersesList = document.getElementById('suggested-verses');
             const suggestedTitlesList = document.getElementById('suggested-titles');
             const generateSermonButtonMemo = document.getElementById('generate-sermon-button-memo');
 
-            // Event listeners for sermon type selection
-            if(assistantButton) assistantButton.addEventListener('click', () => {
-                console.log("Sermon Assistant button clicked.");
-                showScreen('sermon-assistant-screen');
-            });
-            if(expositoryButton) expositoryButton.addEventListener('click', () => {
-                console.log("Expository Sermon button clicked.");
-                showScreen('expository-sermon-screen');
-            });
-            if(realLifeButton) realLifeButton.addEventListener('click', () => {
-                console.log("Real-Life Application Sermon button clicked.");
-                showScreen('real-life-sermon-screen');
-            });
-            if(linkedButton) linkedButton.addEventListener('click', () => {
-                console.log("Quick Memo Linked Sermon button clicked.");
-                showScreen('quick-memo-sermon-screen'); renderMemos();
-            });
-            
-            // Back buttons
-            if(backButtonAssistant) backButtonAssistant.addEventListener('click', () => showScreen('sermon-selection-screen'));
-            if(backButtonExpository) backButtonExpository.addEventListener('click', () => showScreen('sermon-selection-screen'));
-            if(backButtonRealLife) backButtonRealLife.addEventListener('click', () => showScreen('sermon-selection-screen'));
-            if(backButtonMemo) backButtonMemo.addEventListener('click', () => showScreen('sermon-selection-screen'));
-            
-            // Fullscreen buttons
-            if(fullscreenButtonAssistant) {
-                fullscreenButtonAssistant.addEventListener('click', () => {
-                    const content = sermonOutput.value;
-                    showFullscreenModal('Sermon Assistant Output', content);
-                });
-            }
-            if(fullscreenButtonExpository) {
-                fullscreenButtonExpository.addEventListener('click', () => {
-                    const content = expositorySermonOutput.value;
-                    showFullscreenModal('Expository Sermon Output', content);
-                });
-            }
-            if(fullscreenButtonRealLife) {
-                fullscreenButtonRealLife.addEventListener('click', () => {
-                    const content = realLifeSermonOutput.value;
-                    showFullscreenModal('Real-Life Sermon Output', content);
-                });
-            }
-            if(fullscreenButtonMemo) {
-                fullscreenButtonMemo.addEventListener('click', () => {
-                    const content = memoSermonOutput.value;
-                    showFullscreenModal('Quick Memo Sermon Output', content);
-                });
-            }
-            
-            // Modal close buttons
-            if(modalCloseBtn) modalCloseBtn.addEventListener('click', hideFullscreenModal);
-            if(modalFooterCloseBtn) modalFooterCloseBtn.addEventListener('click', hideFullscreenModal);
-
-            // Save Sermon Button Event Listener (Firebase Firestore 저장 로직)
-            const editSermonButton = document.getElementById('edit-sermon-button');
-            const saveEditedSermonButton = document.getElementById('save-edited-sermon-button');
-            const fullscreenTextarea = document.getElementById('fullscreen-textarea');
-
-            // 수정 버튼 클릭 이벤트
-            if(editSermonButton) {
-                editSermonButton.addEventListener('click', () => {
-                    fullscreenTextarea.removeAttribute('readonly'); // 읽기 전용 해제
-                    fullscreenTextarea.focus(); // 텍스트 영역에 포커스
-                    editSermonButton.classList.add('hidden'); // 수정 버튼 숨기기
-                    saveEditedSermonButton.classList.remove('hidden'); // 저장 버튼 보이기
-                    alert('수정 모드가 활성화되었습니다. 내용을 편집할 수 있습니다.');
-                });
-            }
-
-            // 저장 버튼 클릭 이벤트 (Firebase Firestore 저장 로직)
-            if(saveEditedSermonButton) {
-                saveEditedSermonButton.addEventListener('click', async () => {
+            if(generateSermonButtonMemo) {
+                generateSermonButtonMemo.addEventListener('click', async () => {
                     const user = auth.currentUser;
                     if (!user) {
-                        alert('로그인 후 설교를 저장할 수 있습니다.');
+                        alert('Please log in to use this feature.');
                         return;
                     }
-
-                    const editedContent = fullscreenTextarea.value;
-                    const modalCurrentTitle = document.getElementById('modal-title').textContent;
-
-                    if (!editedContent.trim()) {
-                        alert('설교 내용이 비어 있습니다. 저장할 수 없습니다.');
+                    const selectedTitleItem = document.querySelector('.suggestion-item.selected');
+                    const selectedMemoItem = document.querySelector('.memo-list-item.selected');
+                    if (!selectedMemoItem || !selectedTitleItem) {
+                        alert('Please select a quick memo and click on a suggested title.');
                         return;
                     }
+                    const memoContent = selectedMemoItem.dataset.content;
+                    const sermonTitle = selectedTitleItem.dataset.title;
 
+                    showLoading(generateSermonButtonMemo, true);
                     try {
-                        const sermonData = {
-                            title: modalCurrentTitle,
-                            content: editedContent,
-                            author: user.email,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            userId: user.uid
-                        };
-
-                        await db.collection('sermons').add(sermonData);
-                        
-                        alert('수정된 설교가 성공적으로 저장되었습니다!');
-                        console.log('Sermon saved to Firestore:', sermonData);
-
-                        fullscreenTextarea.setAttribute('readonly', 'true'); // 다시 읽기 전용으로 설정
-                        saveEditedSermonButton.classList.add('hidden'); // 저장 버튼 숨기기
-                        editSermonButton.classList.remove('hidden'); // 수정 버튼 보이기
-
+                        const prompt = `Generate a sermon with the title "${sermonTitle}", based on the following memo: "${memoContent}". Incorporate relevant Bible verses if possible.`;
+                        const sermon = await callGeminiApi(prompt);
+                        memoSermonOutput.value = sermon;
                     } catch (error) {
-                        console.error("Firestore 저장 중 오류 발생:", error);
-                        alert('설교를 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
+                        memoSermonOutput.value = `Error: ${error.message}`;
+                    } finally {
+                        showLoading(generateSermonButtonMemo, false);
                     }
                 });
-            }
-
-            // Print Sermon Button Event Listener
-            if(printSermonButton) {
-                printSermonButton.addEventListener('click', () => {
-                    const sermonContent = document.getElementById('fullscreen-textarea').value;
-                    const modalCurrentTitle = document.getElementById('modal-title').textContent;
-                    
-                    const printWindow = window.open('', '', 'height=600,width=800');
-                    if (printWindow) {
-                        printWindow.document.write('<html><head><title>' + modalCurrentTitle + '</title>');
-                        printWindow.document.write('<style>');
-                        printWindow.document.write(`
-                            body { font-family: 'Inter', sans-serif; margin: 20px; color: black; background-color: white; }
-                            h1 { font-size: 24pt; text-align: center; margin-bottom: 20px; }
-                            pre { white-space: pre-wrap; word-wrap: break-word; font-size: 11pt; line-height: 1.5; }
-                        `);
-                        printWindow.document.write('</style></head><body>');
-                        printWindow.document.write('<h1>' + modalCurrentTitle + '</h1>');
-                        printWindow.document.write('<pre>' + sermonContent + '</pre>');
-                        printWindow.document.write('</body></html>');
-                        printWindow.document.close();
-                        printWindow.print();
-                    } else {
-                        alert('Please allow pop-ups for printing.');
-                    }
-                });
-            }
-
-            // Quick Memo Popup Event Listeners
-            if (recordMemoButton) {
-                recordMemoButton.addEventListener('click', () => {
-                    if (mediaRecorder && mediaRecorder.state === 'recording') {
-                        stopRecording();
-                        recordMemoButton.textContent = '🎙️ Record';
-                        recordingStatus.classList.add('hidden');
-                        alert('Recording stopped.');
-                    } else {
-                        startRecording();
-                    }
-                });
-            }
-
-            if (saveQuickMemoButton) {
-                saveQuickMemoButton.addEventListener('click', () => {
-                    saveMemoToLocalStorage(quickMemoTextarea.value);
-                });
-            }
-
-            if (closeQuickMemoModalButton) {
-                closeQuickMemoModalButton.addEventListener('click', hideQuickMemoModal);
-            }
-            if (cancelQuickMemoButton) {
-                cancelQuickMemoButton.addEventListener('click', hideQuickMemoModal);
-            }
-
-            const backToLandingButtonFromMemo = document.getElementById('back-to-landing-button-from-memo');
-            if (backToLandingButtonFromMemo) {
-                backToLandingButtonFromMemo.addEventListener('click', () => showScreen('sermon-selection-screen'));
             }
         });
     </script>
