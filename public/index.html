@@ -348,10 +348,11 @@
                 </form>
             </div>
 
-            <div id="sermon-selection-screen" class="hidden w-full max-w-4xl mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-                <button id="back-to-landing-button" class="col-span-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 mb-4">
-                    ← Back to Initial Screen
+            <div id="sermon-selection-screen" class="hidden w-full max-w-4xl mt-12 grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+                 <button id="back-to-landing-button" class="absolute top-0 left-0 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">
+                    ← 이전 화면
                 </button>
+                
                 <button id="btn-assistant" class="sermon-type-button">
                     <span class="sermon-icon">🤖</span>
                     <span class="sermon-title">Sermon Assistant</span>
@@ -521,9 +522,18 @@
                 <textarea id="fullscreen-textarea" class="w-full h-full bg-transparent text-white text-lg p-4" ></textarea>
             </div>
             <div class="modal-footer flex justify-end space-x-4 print-button-group">
-                <button id="save-sermon-button" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300">Save Sermon</button>
-                <button id="print-sermon-button" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition duration-300">Print Sermon</button>
-                <button id="modal-close-btn-footer" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition duration-300">Close</button>
+                <button id="edit-sermon-button" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300">
+                    수정
+                </button>
+                <button id="save-edited-sermon-button" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300 hidden">
+                    저장
+                </button>
+                <button id="print-sermon-button" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300">
+                    인쇄
+                </button>
+                <button id="modal-close-btn-footer" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition duration-300">
+                    닫기
+                </button>
             </div>
         </div>
     </div>
@@ -532,6 +542,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="text-xl font-bold">Quick Memo</h3>
+                <span id="memo-count" class="text-gray-400">오늘 메모: 0/5</span>
                 <button id="close-quick-memo-modal-btn" class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
             </div>
             <div class="modal-body">
@@ -556,7 +567,7 @@
             <p class="text-xl text-gray-300 mb-8">Upgrade to Premium to access exclusive benefits:</p>
             <ul class="premium-benefits-list">
                 <li><svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Unlimited AI Sermon Generation</li>
-             <li><svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Advanced AI Personalization</li>
+               <li><svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Advanced AI Personalization</li>
                 <li><svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Cloud Sync & Storage for All Notes</li>
                 <li><svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Priority Support</li>
             </ul>
@@ -580,9 +591,10 @@
              measurementId: "G-CWDVF5K3HX" // ⭐ 추가됨: 스크린샷에서 확인된 measurementId ⭐
         };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth(); // Get Firebase Auth instance
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-         const apiKey = "AIzaSyD4qxYQf7BXy4q8aP8Hyd-fif_WdGC8w2E";
+        const apiKey = "AIzaSyD4qxYQf7BXy4q8aP8Hyd-fif_WdGC8w2E";
         const LOCAL_STORAGE_MEMO_KEY = 'sermonnote_quick_memos'; // localStorage key for memos
 
         // --- Utility Functions ---
@@ -735,6 +747,9 @@
             if (modal && modalTitle && modalTextarea) {
                 modalTitle.textContent = title;
                 modalTextarea.value = content;
+                modalTextarea.setAttribute('readonly', 'true'); // 기본은 읽기 전용
+                document.getElementById('edit-sermon-button').classList.remove('hidden');
+                document.getElementById('save-edited-sermon-button').classList.add('hidden');
                 modal.classList.remove('hidden');
                 modal.style.display = 'flex';
             }
@@ -770,6 +785,12 @@
                 recordMemoButton.disabled = false; // Enable button
                 quickMemoPopupModal.classList.remove('hidden');
                 quickMemoPopupModal.style.display = 'flex';
+                
+                // ⭐ 추가: 오늘 저장된 메모 개수 업데이트
+                const today = new Date().toDateString();
+                let memos = loadMemosFromLocalStorage();
+                const todayMemos = memos.filter(memo => new Date(memo.timestamp).toDateString() === today);
+                document.getElementById('memo-count').textContent = `오늘 메모: ${todayMemos.length}/5`;
             }
         }
 
@@ -887,13 +908,24 @@
             recordingStatus.classList.add('hidden');
             recordMemoButton.disabled = false;
         }
-
+        
+        // ⭐ 수정된 부분: 일일 메모 제한 기능 포함 ⭐
         function saveMemoToLocalStorage(content) {
             if (!content.trim()) {
-                alert('Please enter some memo content.');
+                alert('메모 내용을 입력해 주세요.');
                 return;
             }
+
+            // 오늘 날짜로 저장된 메모 개수 확인
+            const today = new Date().toDateString();
             let memos = loadMemosFromLocalStorage();
+            const todayMemos = memos.filter(memo => new Date(memo.timestamp).toDateString() === today);
+
+            if (todayMemos.length >= 5) {
+                alert('오늘 저장할 수 있는 퀵메모는 최대 5개까지입니다.');
+                return;
+            }
+
             const newMemo = {
                 id: Date.now().toString(),
                 content: content,
@@ -901,8 +933,9 @@
             };
             memos.push(newMemo);
             localStorage.setItem(LOCAL_STORAGE_MEMO_KEY, JSON.stringify(memos));
-            alert('Memo saved successfully!');
+            alert('메모가 성공적으로 저장되었습니다!');
             hideQuickMemoModal();
+            renderMemos(); // 저장 후 퀵메모 리스트를 새로고침합니다.
         }
 
         function loadMemosFromLocalStorage() {
@@ -941,6 +974,7 @@
                 li.innerHTML = `<strong>${memo.timestamp}</strong><br>${memo.content}`;
                 li.dataset.content = memo.content;
 
+                // ⭐ 퀵메모 리스트 클릭 시 설교 작성 로직 ⭐
                 li.addEventListener('click', async () => {
                     document.querySelectorAll('.memo-list-item').forEach(item => item.classList.remove('selected'));
                     li.classList.add('selected');
@@ -1197,9 +1231,16 @@ Format the response clearly with headings for "Suggested Verses" and "Suggested 
             
             if (landingPremiumButton) landingPremiumButton.addEventListener('click', () => navigateTo('show-premium'));
             
+            // ⭐ 수정된 부분: Quick Memo 버튼 클릭 시 로그인 상태 확인 ⭐
             if (landingQuickMemoButton) landingQuickMemoButton.addEventListener('click', () => {
-                console.log("Landing Quick Memo button clicked.");
-                showQuickMemoModal();
+                const user = auth.currentUser;
+                if (user) {
+                    console.log("Landing Quick Memo button clicked by logged-in user. Showing quick memo modal.");
+                    showQuickMemoModal();
+                } else {
+                    console.log("Landing Quick Memo button clicked without login. Navigating to login screen.");
+                    navigateTo('app-login');
+                }
             });
 
             // Navigational links within landing page sections (scroll behavior)
@@ -1395,13 +1436,61 @@ Format the response clearly with headings for "Suggested Verses" and "Suggested 
             if(modalCloseBtn) modalCloseBtn.addEventListener('click', hideFullscreenModal);
             if(modalFooterCloseBtn) modalFooterCloseBtn.addEventListener('click', hideFullscreenModal);
 
-            // Save Sermon Button Event Listener
-            if(saveSermonButton) {
-                saveSermonButton.addEventListener('click', () => {
-                    const sermonContent = document.getElementById('fullscreen-textarea').value;
+            // Save Sermon Button Event Listener (Firebase Firestore 저장 로직)
+            const editSermonButton = document.getElementById('edit-sermon-button');
+            const saveEditedSermonButton = document.getElementById('save-edited-sermon-button');
+            const fullscreenTextarea = document.getElementById('fullscreen-textarea');
+
+            // 수정 버튼 클릭 이벤트
+            if(editSermonButton) {
+                editSermonButton.addEventListener('click', () => {
+                    fullscreenTextarea.removeAttribute('readonly'); // 읽기 전용 해제
+                    fullscreenTextarea.focus(); // 텍스트 영역에 포커스
+                    editSermonButton.classList.add('hidden'); // 수정 버튼 숨기기
+                    saveEditedSermonButton.classList.remove('hidden'); // 저장 버튼 보이기
+                    alert('수정 모드가 활성화되었습니다. 내용을 편집할 수 있습니다.');
+                });
+            }
+
+            // 저장 버튼 클릭 이벤트 (Firebase Firestore 저장 로직)
+            if(saveEditedSermonButton) {
+                saveEditedSermonButton.addEventListener('click', async () => {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('로그인 후 설교를 저장할 수 있습니다.');
+                        return;
+                    }
+
+                    const editedContent = fullscreenTextarea.value;
                     const modalCurrentTitle = document.getElementById('modal-title').textContent;
-                    console.log(`Saving sermon: ${modalCurrentTitle}\nContent:\n${sermonContent}`);
-                    alert(`"${modalCurrentTitle}" Sermon saved! (This feature will be fully integrated with Firebase Firestore.)`);
+
+                    if (!editedContent.trim()) {
+                        alert('설교 내용이 비어 있습니다. 저장할 수 없습니다.');
+                        return;
+                    }
+
+                    try {
+                        const sermonData = {
+                            title: modalCurrentTitle,
+                            content: editedContent,
+                            author: user.email,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            userId: user.uid
+                        };
+
+                        await db.collection('sermons').add(sermonData);
+                        
+                        alert('수정된 설교가 성공적으로 저장되었습니다!');
+                        console.log('Sermon saved to Firestore:', sermonData);
+
+                        fullscreenTextarea.setAttribute('readonly', 'true'); // 다시 읽기 전용으로 설정
+                        saveEditedSermonButton.classList.add('hidden'); // 저장 버튼 숨기기
+                        editSermonButton.classList.remove('hidden'); // 수정 버튼 보이기
+
+                    } catch (error) {
+                        console.error("Firestore 저장 중 오류 발생:", error);
+                        alert('설교를 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.');
+                    }
                 });
             }
 
@@ -1457,6 +1546,11 @@ Format the response clearly with headings for "Suggested Verses" and "Suggested 
             }
             if (cancelQuickMemoButton) {
                 cancelQuickMemoButton.addEventListener('click', hideQuickMemoModal);
+            }
+
+            const backToLandingButtonFromMemo = document.getElementById('back-to-landing-button-from-memo');
+            if (backToLandingButtonFromMemo) {
+                backToLandingButtonFromMemo.addEventListener('click', () => showScreen('sermon-selection-screen'));
             }
         });
     </script>
