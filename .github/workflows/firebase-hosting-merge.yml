@@ -2,7 +2,7 @@
 # https://github.com/firebase/firebase-tools
 
 name: Deploy to Firebase Hosting on merge
-on:
+'on':
   push:
     branches:
       - main
@@ -11,17 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # ⭐ 이 부분을 수정했습니다.
-      - name: Install dependencies in functions directory
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Install dependencies and build
         run: npm ci
         working-directory: ./functions
-      - name: Build and deploy
-        run: npm run build
+      - name: Deploy to Firebase
+        run: firebase deploy --only functions
         working-directory: ./functions
-      # ⭐ 여기까지만 수정하면 됩니다.
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SERMONNOTE_LIVE }}
-          channelId: live
-          projectId: sermonnote-live
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
