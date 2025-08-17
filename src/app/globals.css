@@ -1,0 +1,21 @@
+/* Tailwind CSS 없이 기본 CSS로 시작 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Noto Sans', 'Open Sans', 'Lato', sans-serif;
+  background-color: #ffffff;
+  color: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  html, body {
+    background-color: #0a0a0a;
+    color: #ededed;
+  }
+}
+
+/* 나중에 Tailwind 추가 예정 */
