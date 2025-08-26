@@ -1,8 +1,9 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, updateDoc, collection, query, where, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
+// src/lib/firebase.js
+// Firebase 앱을 초기화하고 필요한 객체들을 export하는 유일한 파일
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth, signOut } from "firebase/auth";
+import { getFirestore, doc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs, setDoc, arrayUnion } from "firebase/firestore";
 
-// Firebase configuration
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -13,84 +14,127 @@ const firebaseConfig = {
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Firebase 앱 초기화
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+let app;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Firebase 앱이 이미 초기화되었는지 확인
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApp();
+}
 
-// 구독 제한 설정
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// signOut 함수를 내보냅니다.
+export const doSignOut = () => signOut(auth);
+
+export { app, auth, db };
+
 export const SUBSCRIPTION_LIMITS = {
-    'free': { commentary: 5, sermon: 5 },
-    'general': { commentary: 100, sermon: 100 },
-    'premium': { commentary: Infinity, sermon: Infinity }
+    free: { sermon: 5, commentary: 10 },
+    premium: { sermon: Infinity, commentary: Infinity }
 };
 
-// 사용량 증가 함수
-export const incrementUsageCount = async (type, userId, currentCount, setErrorMessage) => {
-    if (!db || !userId) {
-        setErrorMessage?.('사용자 인증 또는 데이터베이스 연결 실패');
-        return false;
-    }
-    
-    try {
-        const userRef = doc(db, 'users', userId);
-        const updateData = {
-            [`${type}_count`]: currentCount + 1,
-            last_updated: serverTimestamp()
-        };
-        await updateDoc(userRef, updateData);
-        return true;
-    } catch (error) {
-        console.error("Usage count update failed:", error);
-        setErrorMessage?.(`사용량 업데이트 실패: ${error.message}`);
-        return false;
-    }
-};
+// 환경 변수에서 앱 ID를 직접 가져옵니다.
+const appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID;
 
-// 퀵 메모 추가 함수
-export const addQuickMemo = async (userId, content, lang = 'ko') => {
-    if (!db || !userId) {
-        throw new Error('사용자 인증 또는 데이터베이스 연결 실패');
+export const incrementUsageCount = async (type, userId, currentCount) => {
+    // appId가 존재하지 않을 경우 오류 방지
+    if (!appId || !userId) {
+        console.error("Firebase App ID or User ID is not defined.");
+        return;
     }
+    const userRef = doc(db, 'artifacts', appId, 'users', userId);
     
     try {
-        const memosCollection = collection(db, 'quickMemos');
-        const docRef = await addDoc(memosCollection, {
-            userId: userId,
-            content: content,
-            language: lang,
-            timestamp: serverTimestamp(),
-            created_at: new Date(),
+        await updateDoc(userRef, {
+            [`usage.${type}`]: (currentCount || 0) + 1,
+            lastUsed: new Date(),
         });
-        return docRef.id;
     } catch (error) {
-        console.error('메모 저장 실패:', error);
-        throw new Error('메모 저장에 실패했습니다.');
+        if (error.code === 'not-found') {
+            try {
+                await setDoc(userRef, {
+                    usage: {
+                        [type]: 1,
+                    },
+                    lastUsed: new Date(),
+                }, { merge: true });
+            } catch (e) {
+                console.error("Error creating usage document in Firestore:", e);
+            }
+        } else {
+            console.error("Error updating usage count in Firestore:", error);
+        }
     }
 };
 
-// 일일 메모 제한 확인 함수
-export const checkDailyMemoLimit = async (userId, limit = 5) => {
-    if (!db || !userId) {
-        throw new Error('사용자 인증 또는 데이터베이스 연결 실패');
+export const addQuickMemo = async (userId, content) => {
+    if (!appId || !userId) {
+        console.error("Firebase App ID or User ID is not defined.");
+        return;
     }
-    
-    try {
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
-        
-        const memosCollection = collection(db, 'quickMemos');
-        const q = query(
-            memosCollection,
-            where('userId', '==', userId),
-            where('timestamp', '>=', startOfToday)
-        );
+    const memosRef = collection(db, 'artifacts', appId, 'users', userId, 'quickMemos');
+    await addDoc(memosRef, {
+        content: content,
+        timestamp: serverTimestamp()
+    });
+};
 
-        const snapshot = await getDocs(q);
-        return snapshot.size;
-    } catch (error) {
-        console.error('메모 개수 확인 실패:', error);
+export const checkDailyMemoLimit = async (userId) => {
+    if (!appId || !userId) {
+        console.error("Firebase App ID or User ID is not defined.");
         return 0;
+    }
+    const memosRef = collection(db, 'artifacts', appId, 'users', userId, 'quickMemos');
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const q = query(memosRef, 
+        where('timestamp', '>', today),
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.size;
+};
+
+export const getSermonHistory = async (userId) => {
+    if (!appId || !userId) {
+        console.error("Firebase App ID or User ID is not defined.");
+        return [];
+    }
+    const sermonsCollectionRef = collection(db, 'artifacts', appId, 'users', userId, 'sermons');
+    try {
+        const q = query(sermonsCollectionRef);
+        const querySnapshot = await getDocs(q);
+        const sermonHistory = [];
+        querySnapshot.forEach((doc) => {
+            sermonHistory.push({
+                id: doc.id,
+                ...doc.data(),
+            });
+        });
+        return sermonHistory;
+    } catch (error) {
+        console.error("과거 기록을 가져오는 데 실패했습니다:", error);
+        return [];
+    }
+};
+
+export const saveSermon = async (userId, sermonData) => {
+    if (!appId || !userId) {
+        console.error("Firebase App ID or User ID is not defined.");
+        return;
+    }
+    const sermonsCollectionRef = collection(db, 'artifacts', appId, 'users', userId, 'sermons');
+    try {
+        await addDoc(sermonsCollectionRef, {
+            ...sermonData,
+            createdAt: serverTimestamp(),
+        });
+    } catch (error) {
+        console.error("설교문 저장에 실패했습니다:", error);
     }
 };
